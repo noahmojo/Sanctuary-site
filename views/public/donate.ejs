@@ -1,40 +1,49 @@
 <%- include('../partials/header', { settings, title: 'Donate' }) %>
 
 <section class="py-16">
-  <div class="max-w-4xl mx-auto px-6">
+  <div class="max-w-3xl mx-auto px-6">
     <div class="text-center mb-12">
-      <h1 class="text-4xl font-light text-sage-800 mb-4">Support Our Sanctuary</h1>
-      <p class="text-xl text-sage-600">Your generosity directly impacts the lives of our animals.</p>
+      <h1 class="text-4xl font-light mb-3">Support the Sanctuary</h1>
+      <p class="text-neutral-500">Your donation directly supports our animals' care</p>
     </div>
     
-    <div class="grid md:grid-cols-3 gap-6 mb-12">
-      <div class="bg-white rounded-xl p-6 text-center shadow-sm">
-        <div class="text-4xl mb-4">🌾</div>
-        <h3 class="font-bold text-sage-800 text-xl mb-2">$25</h3>
-        <p class="text-sage-600">Feeds an animal for a week</p>
+    <div class="grid md:grid-cols-3 gap-4 mb-12">
+      <div class="bg-neutral-50 rounded-2xl p-6 text-center">
+        <div class="text-3xl mb-3">🌾</div>
+        <p class="text-2xl font-light mb-1">$25</p>
+        <p class="text-sm text-neutral-500">Feeds an animal for a week</p>
       </div>
-      <div class="bg-white rounded-xl p-6 text-center shadow-sm">
-        <div class="text-4xl mb-4">💊</div>
-        <h3 class="font-bold text-sage-800 text-xl mb-2">$75</h3>
-        <p class="text-sage-600">Covers a vet checkup</p>
+      <div class="bg-neutral-50 rounded-2xl p-6 text-center">
+        <div class="text-3xl mb-3">💊</div>
+        <p class="text-2xl font-light mb-1">$75</p>
+        <p class="text-sm text-neutral-500">Covers a vet checkup</p>
       </div>
-      <div class="bg-white rounded-xl p-6 text-center shadow-sm">
-        <div class="text-4xl mb-4">🏠</div>
-        <h3 class="font-bold text-sage-800 text-xl mb-2">$150</h3>
-        <p class="text-sage-600">Monthly shelter maintenance</p>
+      <div class="bg-neutral-50 rounded-2xl p-6 text-center">
+        <div class="text-3xl mb-3">🏠</div>
+        <p class="text-2xl font-light mb-1">$150</p>
+        <p class="text-sm text-neutral-500">Monthly shelter costs</p>
       </div>
     </div>
     
-    <div class="bg-white rounded-xl p-8 shadow-lg text-center">
-      <h2 class="text-2xl font-semibold text-sage-800 mb-6">Make a Donation</h2>
-      
+    <div class="bg-white border border-neutral-100 rounded-2xl p-8 text-center">
+      <h2 class="text-xl font-medium mb-4">Make a Donation</h2>
       <% if (settings.donateUrl) { %>
-        <a href="<%= settings.donateUrl %>" target="_blank" class="inline-block bg-sage-600 text-white px-12 py-4 rounded-xl text-xl font-medium hover:bg-sage-700 transition">Donate Online</a>
+        <a href="<%= settings.donateUrl %>" target="_blank" class="inline-block bg-neutral-900 text-white px-12 py-4 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Donate Online</a>
       <% } else { %>
-        <p class="text-sage-600 mb-6">Contact us to make a donation:</p>
-        <p class="text-sage-800 font-medium">Sierra Alpaca Sanctuary</p>
-        <p class="text-sage-600">Camino, California</p>
+        <p class="text-neutral-500 mb-4">Contact us to donate:</p>
+        <p class="font-medium"><%= settings.siteName %></p>
+        <p class="text-neutral-400 text-sm"><%= settings.location %></p>
       <% } %>
+    </div>
+    
+    <div class="mt-12 text-center">
+      <h3 class="font-medium mb-4">Other Ways to Help</h3>
+      <div class="flex flex-wrap justify-center gap-4">
+        <span class="bg-neutral-50 px-4 py-2 rounded-full text-sm text-neutral-600">Volunteer</span>
+        <span class="bg-neutral-50 px-4 py-2 rounded-full text-sm text-neutral-600">Sponsor an Animal</span>
+        <span class="bg-neutral-50 px-4 py-2 rounded-full text-sm text-neutral-600">Donate Supplies</span>
+        <span class="bg-neutral-50 px-4 py-2 rounded-full text-sm text-neutral-600">Spread the Word</span>
+      </div>
     </div>
   </div>
 </section>

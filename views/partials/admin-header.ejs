@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin | <%= typeof settings !== 'undefined' ? settings.siteName : 'Sanctuary CMS' %></title>
+  <title>Admin | Sanctuary CMS</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>* { font-family: 'Inter', sans-serif; }</style>
 </head>
-<body class="bg-stone-100 min-h-screen">
-  <nav class="bg-stone-800 text-white shadow-lg">
+<body class="bg-neutral-50 min-h-screen">
+  <nav class="bg-neutral-900 text-white">
     <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-      <a href="/admin" class="text-xl font-light">🛠️ Sanctuary CMS</a>
-      <div class="flex gap-6 items-center">
-        <a href="/admin/animals" class="hover:text-stone-300 transition">Animals</a>
-        <a href="/admin/settings" class="hover:text-stone-300 transition">Settings</a>
-        <a href="/" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg transition" target="_blank">View Site →</a>
+      <a href="/admin" class="font-medium">🛠️ Sanctuary CMS</a>
+      <div class="flex gap-6 items-center text-sm">
+        <a href="/admin/animals" class="text-neutral-300 hover:text-white transition">Animals</a>
+        <a href="/admin/bookings" class="text-neutral-300 hover:text-white transition">Bookings</a>
+        <a href="/admin/settings" class="text-neutral-300 hover:text-white transition">Settings</a>
+        <a href="/" target="_blank" class="bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-700 transition">View Site →</a>
       </div>
     </div>
   </nav>

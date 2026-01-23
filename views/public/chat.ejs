@@ -1,0 +1,93 @@
+<%- include('../partials/header', { settings, title: 'Chat with ' + animal.name }) %>
+
+<section class="py-6 min-h-[calc(100vh-4rem)]">
+  <div class="max-w-xl mx-auto px-6 h-full flex flex-col">
+    <div class="flex items-center gap-4 pb-4 border-b border-neutral-100 mb-4">
+      <a href="/animal/<%= animal.id %>" class="text-neutral-300 hover:text-neutral-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </a>
+      <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-50 to-emerald-50 overflow-hidden flex items-center justify-center">
+        <% if (animal.photos && animal.photos.length > 0) { %>
+          <img src="<%= animal.photos[0] %>" class="w-full h-full object-cover">
+        <% } else { %>
+          <span class="text-xl"><%= animal.species === 'Alpaca' ? '🦙' : '🐑' %></span>
+        <% } %>
+      </div>
+      <div>
+        <h1 class="font-medium"><%= animal.name %></h1>
+        <p class="text-xs text-neutral-400"><%= animal.breed %> · <span class="text-emerald-500">● Online</span></p>
+      </div>
+    </div>
+    
+    <div id="messages" class="flex-1 overflow-y-auto space-y-4 pb-4">
+      <div class="flex gap-3">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-50 to-emerald-50 flex items-center justify-center text-sm flex-shrink-0 overflow-hidden">
+          <% if (animal.photos && animal.photos.length > 0) { %>
+            <img src="<%= animal.photos[0] %>" class="w-full h-full object-cover">
+          <% } else { %>
+            <%= animal.species === 'Alpaca' ? '🦙' : '🐑' %>
+          <% } %>
+        </div>
+        <div class="bg-neutral-100 rounded-2xl rounded-tl-md px-4 py-2.5 max-w-[80%]">
+          <p class="text-sm">Hi! I'm <%= animal.name %>. <%= animal.personality %>! Ask me anything.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="border-t border-neutral-100 pt-4">
+      <form id="chatForm" class="flex gap-3">
+        <input type="text" id="input" placeholder="Message <%= animal.name %>..." autocomplete="off" class="flex-1 bg-neutral-100 rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20">
+        <button type="submit" class="bg-emerald-600 text-white w-11 h-11 rounded-full flex items-center justify-center hover:bg-emerald-700 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+        </button>
+      </form>
+      <p class="text-xs text-neutral-400 text-center mt-3">Chat simulation for fun!</p>
+    </div>
+  </div>
+</section>
+
+<script>
+const msgs = document.getElementById('messages');
+const form = document.getElementById('chatForm');
+const input = document.getElementById('input');
+const id = '<%= animal.id %>';
+const photo = '<%= animal.photos && animal.photos.length > 0 ? animal.photos[0] : "" %>';
+const emoji = '<%= animal.species === "Alpaca" ? "🦙" : "🐑" %>';
+
+function add(text, isUser) {
+  const d = document.createElement('div');
+  d.className = 'flex gap-3' + (isUser ? ' justify-end' : '');
+  const avatar = photo ? `<img src="${photo}" class="w-full h-full object-cover">` : emoji;
+  d.innerHTML = isUser 
+    ? `<div class="bg-emerald-600 text-white rounded-2xl rounded-tr-md px-4 py-2.5 max-w-[80%]"><p class="text-sm">${text}</p></div>`
+    : `<div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-50 to-emerald-50 flex items-center justify-center text-sm flex-shrink-0 overflow-hidden">${avatar}</div><div class="bg-neutral-100 rounded-2xl rounded-tl-md px-4 py-2.5 max-w-[80%]"><p class="text-sm">${text}</p></div>`;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function typing() {
+  const d = document.createElement('div');
+  d.id = 'typing';
+  d.className = 'flex gap-3';
+  const avatar = photo ? `<img src="${photo}" class="w-full h-full object-cover">` : emoji;
+  d.innerHTML = `<div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-50 to-emerald-50 flex items-center justify-center text-sm flex-shrink-0 overflow-hidden">${avatar}</div><div class="bg-neutral-100 rounded-2xl rounded-tl-md px-4 py-3"><div class="flex gap-1"><span class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"></span><span class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay:.15s"></span><span class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay:.3s"></span></div></div>`;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  const msg = input.value.trim();
+  if (!msg) return;
+  add(msg, true);
+  input.value = '';
+  typing();
+  try {
+    const res = await fetch(`/api/chat/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) });
+    const data = await res.json();
+    setTimeout(() => { document.getElementById('typing')?.remove(); add(data.response, false); }, 600 + Math.random() * 600);
+  } catch { document.getElementById('typing')?.remove(); add("*looks confused* Sorry, what was that?", false); }
+};
+</script>
+
+<%- include('../partials/footer', { settings }) %>

@@ -1,0 +1,93 @@
+<%- include('../partials/header', { settings, title: 'Book a Visit' }) %>
+
+<section class="py-16">
+  <div class="max-w-2xl mx-auto px-6">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-light mb-3">Book a Visit</h1>
+      <p class="text-neutral-500">Bring our animals to your school, nursing home, or event</p>
+    </div>
+    
+    <% if (success) { %>
+      <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 mb-8 text-center">
+        <p class="text-emerald-700 font-medium mb-2">✓ Request Submitted!</p>
+        <p class="text-emerald-600 text-sm">We'll be in touch within 24-48 hours to confirm details.</p>
+      </div>
+    <% } %>
+    
+    <div class="grid grid-cols-3 gap-4 mb-12">
+      <div class="text-center p-6 bg-neutral-50 rounded-2xl">
+        <div class="text-3xl mb-2">🏫</div>
+        <p class="font-medium text-sm">Schools</p>
+        <p class="text-xs text-neutral-400">Educational visits</p>
+      </div>
+      <div class="text-center p-6 bg-neutral-50 rounded-2xl">
+        <div class="text-3xl mb-2">🏥</div>
+        <p class="font-medium text-sm">Care Facilities</p>
+        <p class="text-xs text-neutral-400">Therapeutic visits</p>
+      </div>
+      <div class="text-center p-6 bg-neutral-50 rounded-2xl">
+        <div class="text-3xl mb-2">🎉</div>
+        <p class="font-medium text-sm">Events</p>
+        <p class="text-xs text-neutral-400">Parties & more</p>
+      </div>
+    </div>
+    
+    <form method="POST" action="/book" class="space-y-6">
+      <div>
+        <label class="block text-sm font-medium mb-2">Type of Visit</label>
+        <select name="type" required class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20">
+          <option value="">Select type...</option>
+          <option value="school">School / Educational</option>
+          <option value="nursing">Nursing Home / Assisted Living</option>
+          <option value="hospital">Hospital / Medical Facility</option>
+          <option value="event">Private Event / Party</option>
+          <option value="corporate">Corporate Event</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium mb-2">Organization Name</label>
+        <input type="text" name="organization" required class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20" placeholder="School or facility name">
+      </div>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-2">Contact Name</label>
+          <input type="text" name="contact" required class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">Phone</label>
+          <input type="tel" name="phone" class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20">
+        </div>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium mb-2">Email</label>
+        <input type="email" name="email" required class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20">
+      </div>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-2">Preferred Date</label>
+          <input type="date" name="date" required class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">Expected Attendees</label>
+          <input type="number" name="attendees" min="1" class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20" placeholder="Approx number">
+        </div>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium mb-2">Additional Information</label>
+        <textarea name="message" rows="4" class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20 resize-none" placeholder="Tell us about your event, any special requests, or questions..."></textarea>
+      </div>
+      
+      <button type="submit" class="w-full bg-neutral-900 text-white py-4 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Submit Request</button>
+    </form>
+    
+    <p class="text-center text-neutral-400 text-xs mt-6">We typically respond within 24-48 hours</p>
+  </div>
+</section>
+
+<%- include('../partials/footer', { settings }) %>

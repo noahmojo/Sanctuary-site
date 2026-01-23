@@ -1,0 +1,43 @@
+<%- include('../partials/admin-header') %>
+
+<h1 class="text-2xl font-light mb-8">Bookings</h1>
+
+<% if (bookings.length === 0) { %>
+  <div class="bg-white rounded-xl p-12 text-center">
+    <p class="text-neutral-400">No booking requests yet</p>
+  </div>
+<% } else { %>
+  <div class="space-y-4">
+    <% bookings.slice().reverse().forEach(b => { %>
+      <div class="bg-white rounded-xl p-5">
+        <div class="flex justify-between items-start mb-3">
+          <div>
+            <h3 class="font-medium"><%= b.organization %></h3>
+            <p class="text-neutral-400 text-sm"><%= b.type %> · <%= b.attendees ? b.attendees + ' attendees' : '' %></p>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs <%= b.status === 'pending' ? 'bg-amber-50 text-amber-600' : b.status === 'confirmed' ? 'bg-emerald-50 text-emerald-600' : 'bg-neutral-100 text-neutral-500' %>"><%= b.status %></span>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm mb-3">
+          <div><span class="text-neutral-400">Contact:</span> <%= b.contact %></div>
+          <div><span class="text-neutral-400">Email:</span> <%= b.email %></div>
+          <div><span class="text-neutral-400">Phone:</span> <%= b.phone || '-' %></div>
+          <div><span class="text-neutral-400">Date:</span> <%= b.date %></div>
+        </div>
+        <% if (b.message) { %>
+          <p class="text-sm text-neutral-600 bg-neutral-50 p-3 rounded-lg mb-3"><%= b.message %></p>
+        <% } %>
+        <form method="POST" action="/admin/bookings/<%= b.id %>/status" class="flex gap-2">
+          <select name="status" class="bg-neutral-50 border-0 rounded-lg px-3 py-2 text-sm">
+            <option value="pending" <%= b.status === 'pending' ? 'selected' : '' %>>Pending</option>
+            <option value="confirmed" <%= b.status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+            <option value="declined" <%= b.status === 'declined' ? 'selected' : '' %>>Declined</option>
+            <option value="completed" <%= b.status === 'completed' ? 'selected' : '' %>>Completed</option>
+          </select>
+          <button type="submit" class="bg-neutral-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-neutral-800 transition">Update</button>
+        </form>
+      </div>
+    <% }); %>
+  </div>
+<% } %>
+
+<%- include('../partials/admin-footer') %>

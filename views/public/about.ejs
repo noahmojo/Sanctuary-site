@@ -1,0 +1,36 @@
+<%- include('../partials/header', { settings, title: 'About' }) %>
+
+<section class="py-16">
+  <div class="max-w-3xl mx-auto px-6">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-light mb-3">About Us</h1>
+      <p class="text-neutral-500"><%= settings.location %></p>
+    </div>
+    
+    <div class="prose prose-neutral max-w-none mb-16">
+      <p class="text-lg text-neutral-600 leading-relaxed"><%= settings.about %></p>
+    </div>
+    
+    <div class="grid md:grid-cols-2 gap-8 mb-16">
+      <div class="bg-neutral-50 rounded-2xl p-8">
+        <h3 class="font-medium mb-4">Our Mission</h3>
+        <p class="text-neutral-600 text-sm leading-relaxed">To provide a safe, loving forever home for alpacas, sheep, and barnyard animals while educating the community about animal welfare and the joy these creatures bring to our lives.</p>
+      </div>
+      <div class="bg-neutral-50 rounded-2xl p-8">
+        <h3 class="font-medium mb-4">Our Residents</h3>
+        <p class="text-neutral-600 text-sm leading-relaxed">We currently care for <%= animals.length %> animals including <%= animals.filter(a => a.species === 'Alpaca').length %> alpacas and <%= animals.filter(a => a.species === 'Sheep').length %> sheep. Each has their own unique personality and story.</p>
+      </div>
+    </div>
+    
+    <div class="text-center">
+      <h3 class="font-medium mb-6">Get Involved</h3>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="/book" class="bg-neutral-900 text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Book a Visit</a>
+        <a href="/donate" class="border border-neutral-200 px-8 py-3 rounded-full text-sm font-medium hover:border-neutral-400 transition">Donate</a>
+        <a href="/animals" class="border border-neutral-200 px-8 py-3 rounded-full text-sm font-medium hover:border-neutral-400 transition">Meet the Animals</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer', { settings }) %>

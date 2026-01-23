@@ -1,8 +1,30 @@
-  <footer class="bg-sage-900 text-sage-200 py-12 mt-16">
-    <div class="max-w-6xl mx-auto px-6 text-center">
-      <p class="text-xl mb-2"><%= settings.siteName %></p>
-      <p class="text-sage-400">Camino, California</p>
-      <p class="text-sage-500 mt-6 text-sm">&copy; <%= new Date().getFullYear() %> <%= settings.siteName %>. All rights reserved.</p>
+  </main>
+  <footer class="border-t border-neutral-100 mt-32">
+    <div class="max-w-6xl mx-auto px-6 py-16">
+      <div class="grid md:grid-cols-4 gap-12">
+        <div class="md:col-span-2">
+          <h3 class="font-medium text-lg mb-3"><%= settings.siteName %></h3>
+          <p class="text-neutral-500 text-sm leading-relaxed max-w-sm"><%= settings.tagline %></p>
+          <p class="text-neutral-400 text-sm mt-3"><%= settings.location %></p>
+        </div>
+        <div>
+          <h4 class="font-medium text-sm mb-4">Visit</h4>
+          <ul class="space-y-2 text-sm text-neutral-500">
+            <li><a href="/animals" class="hover:text-neutral-900 transition">Animals</a></li>
+            <li><a href="/book" class="hover:text-neutral-900 transition">Book a Visit</a></li>
+            <li><a href="/about" class="hover:text-neutral-900 transition">About</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-medium text-sm mb-4">Support</h4>
+          <ul class="space-y-2 text-sm text-neutral-500">
+            <li><a href="/donate" class="hover:text-neutral-900 transition">Donate</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-neutral-100 mt-12 pt-8 text-center text-neutral-400 text-xs">
+        &copy; <%= new Date().getFullYear() %> <%= settings.siteName %>
+      </div>
     </div>
   </footer>
 </body>
