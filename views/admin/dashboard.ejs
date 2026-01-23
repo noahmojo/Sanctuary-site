@@ -1,0 +1,49 @@
+<%- include('../partials/admin-header', { settings }) %>
+
+<h1 class="text-3xl font-light text-stone-800 mb-8">Dashboard</h1>
+
+<div class="grid md:grid-cols-3 gap-6 mb-8">
+  <div class="bg-white rounded-xl p-6 shadow-sm">
+    <div class="text-4xl mb-2">🦙</div>
+    <div class="text-3xl font-bold text-stone-800"><%= animals.length %></div>
+    <div class="text-stone-500">Animals</div>
+  </div>
+  <div class="bg-white rounded-xl p-6 shadow-sm">
+    <div class="text-4xl mb-2">⭐</div>
+    <div class="text-3xl font-bold text-stone-800"><%= animals.filter(a => a.featured).length %></div>
+    <div class="text-stone-500">Featured</div>
+  </div>
+  <div class="bg-white rounded-xl p-6 shadow-sm">
+    <div class="text-4xl mb-2">📷</div>
+    <div class="text-3xl font-bold text-stone-800"><%= animals.reduce((sum, a) => sum + (a.photos?.length || 0), 0) %></div>
+    <div class="text-stone-500">Photos</div>
+  </div>
+</div>
+
+<div class="grid md:grid-cols-2 gap-8">
+  <div class="bg-white rounded-xl p-6 shadow-sm">
+    <h2 class="text-xl font-semibold text-stone-800 mb-4">Quick Actions</h2>
+    <div class="space-y-3">
+      <a href="/admin/animals/new" class="block bg-emerald-50 hover:bg-emerald-100 text-emerald-700 p-4 rounded-lg transition">+ Add New Animal</a>
+      <a href="/admin/settings" class="block bg-stone-50 hover:bg-stone-100 text-stone-700 p-4 rounded-lg transition">⚙️ Site Settings</a>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-xl p-6 shadow-sm">
+    <h2 class="text-xl font-semibold text-stone-800 mb-4">Recent Animals</h2>
+    <% if (animals.length === 0) { %>
+      <p class="text-stone-500">No animals yet. <a href="/admin/animals/new" class="text-emerald-600 hover:underline">Add one!</a></p>
+    <% } else { %>
+      <ul class="space-y-2">
+        <% animals.slice(-5).reverse().forEach(animal => { %>
+          <li class="flex justify-between items-center p-2 hover:bg-stone-50 rounded">
+            <span><strong><%= animal.name %></strong> - <%= animal.breed %></span>
+            <a href="/admin/animals/<%= animal.id %>/edit" class="text-emerald-600 hover:underline text-sm">Edit</a>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/admin-footer') %>

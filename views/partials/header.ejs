@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %><%= settings.siteName %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sage: { 50: '#f6f7f4', 100: '#e3e7dc', 500: '#7d8b6e', 600: '#5f6d52', 700: '#4a5640', 800: '#3d4636', 900: '#2f3629' },
+            sand: { 50: '#fdfcf9', 100: '#f9f5ed', 200: '#f0e8d8', 500: '#b8a88a', 600: '#9a8b6e' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-sand-50 min-h-screen">
+  <nav class="bg-sage-800 text-white">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="/" class="text-2xl font-light tracking-wide"><%= settings.siteName %></a>
+      <div class="flex gap-8 items-center">
+        <a href="/" class="hover:text-sage-200 transition">Home</a>
+        <a href="/animals" class="hover:text-sage-200 transition">Animals</a>
+        <a href="/donate" class="bg-amber-500 hover:bg-amber-600 px-5 py-2 rounded-lg font-medium transition">Donate</a>
+      </div>
+    </div>
+  </nav>

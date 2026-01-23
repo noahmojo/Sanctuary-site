@@ -1,0 +1,42 @@
+<%- include('../partials/header', { settings, title: 'Donate' }) %>
+
+<section class="py-16">
+  <div class="max-w-4xl mx-auto px-6">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-light text-sage-800 mb-4">Support Our Sanctuary</h1>
+      <p class="text-xl text-sage-600">Your generosity directly impacts the lives of our animals.</p>
+    </div>
+    
+    <div class="grid md:grid-cols-3 gap-6 mb-12">
+      <div class="bg-white rounded-xl p-6 text-center shadow-sm">
+        <div class="text-4xl mb-4">🌾</div>
+        <h3 class="font-bold text-sage-800 text-xl mb-2">$25</h3>
+        <p class="text-sage-600">Feeds an animal for a week</p>
+      </div>
+      <div class="bg-white rounded-xl p-6 text-center shadow-sm">
+        <div class="text-4xl mb-4">💊</div>
+        <h3 class="font-bold text-sage-800 text-xl mb-2">$75</h3>
+        <p class="text-sage-600">Covers a vet checkup</p>
+      </div>
+      <div class="bg-white rounded-xl p-6 text-center shadow-sm">
+        <div class="text-4xl mb-4">🏠</div>
+        <h3 class="font-bold text-sage-800 text-xl mb-2">$150</h3>
+        <p class="text-sage-600">Monthly shelter maintenance</p>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-xl p-8 shadow-lg text-center">
+      <h2 class="text-2xl font-semibold text-sage-800 mb-6">Make a Donation</h2>
+      
+      <% if (settings.donateUrl) { %>
+        <a href="<%= settings.donateUrl %>" target="_blank" class="inline-block bg-sage-600 text-white px-12 py-4 rounded-xl text-xl font-medium hover:bg-sage-700 transition">Donate Online</a>
+      <% } else { %>
+        <p class="text-sage-600 mb-6">Contact us to make a donation:</p>
+        <p class="text-sage-800 font-medium">Sierra Alpaca Sanctuary</p>
+        <p class="text-sage-600">Camino, California</p>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer', { settings }) %>

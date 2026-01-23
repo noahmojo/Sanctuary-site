@@ -1,0 +1,61 @@
+<%- include('../partials/header', { settings, title: animal.name }) %>
+
+<section class="py-12">
+  <div class="max-w-4xl mx-auto px-6">
+    <a href="/animals" class="text-sage-600 hover:underline mb-6 inline-block">← Back to all animals</a>
+    
+    <div class="bg-white rounded-2xl overflow-hidden shadow-lg">
+      <% if (animal.photos && animal.photos.length > 0) { %>
+        <img src="<%= animal.photos[0] %>" alt="<%= animal.name %>" class="w-full h-96 object-cover">
+      <% } else { %>
+        <div class="w-full h-96 bg-gradient-to-br from-sand-100 to-sand-200 flex items-center justify-center text-8xl">🦙</div>
+      <% } %>
+      
+      <div class="p-8">
+        <h1 class="text-4xl font-light text-sage-800 mb-2"><%= animal.name %></h1>
+        <p class="text-sage-600 font-medium text-lg mb-6"><%= animal.personality %></p>
+        
+        <div class="grid grid-cols-3 gap-4 mb-8">
+          <div class="bg-sand-100 rounded-xl p-4 text-center">
+            <p class="text-sm text-sage-500">Species</p>
+            <p class="text-lg font-semibold text-sage-800"><%= animal.species %></p>
+          </div>
+          <div class="bg-sand-100 rounded-xl p-4 text-center">
+            <p class="text-sm text-sage-500">Breed</p>
+            <p class="text-lg font-semibold text-sage-800"><%= animal.breed %></p>
+          </div>
+          <div class="bg-sand-100 rounded-xl p-4 text-center">
+            <p class="text-sm text-sage-500">Age</p>
+            <p class="text-lg font-semibold text-sage-800"><%= calcAge(animal.birthday) %></p>
+          </div>
+        </div>
+        
+        <% if (animal.description) { %>
+          <div class="mb-8">
+            <h2 class="text-xl font-semibold text-sage-800 mb-3">About <%= animal.name %></h2>
+            <p class="text-sage-700 leading-relaxed"><%= animal.description %></p>
+          </div>
+        <% } %>
+        
+        <% if (animal.photos && animal.photos.length > 1) { %>
+          <div class="mb-8">
+            <h2 class="text-xl font-semibold text-sage-800 mb-4">Photo Gallery</h2>
+            <div class="grid grid-cols-3 gap-4">
+              <% animal.photos.forEach(photo => { %>
+                <img src="<%= photo %>" alt="<%= animal.name %>" class="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition" onclick="window.open('<%= photo %>', '_blank')">
+              <% }); %>
+            </div>
+          </div>
+        <% } %>
+        
+        <div class="bg-sage-50 rounded-xl p-6 text-center">
+          <h3 class="text-xl font-semibold text-sage-800 mb-2">Support <%= animal.name %></h3>
+          <p class="text-sage-600 mb-4">Your donation helps provide food, shelter, and medical care.</p>
+          <a href="/donate" class="inline-block bg-sage-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-sage-700 transition">Donate Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer', { settings }) %>
