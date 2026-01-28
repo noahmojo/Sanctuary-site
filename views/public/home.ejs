@@ -1,8 +1,14 @@
 <%- include('../partials/header', { settings }) %>
 
 <!-- Hero -->
-<section class="min-h-[85vh] flex items-center">
-  <div class="max-w-6xl mx-auto px-6 w-full">
+<section class="min-h-[85vh] flex items-center relative overflow-hidden">
+  <% if (settings.heroImage) { %>
+    <div class="absolute inset-0">
+      <img src="<%= settings.heroImage %>" alt="Sanctuary" class="w-full h-full object-cover">
+      <div class="absolute inset-0 bg-white/70"></div>
+    </div>
+  <% } %>
+  <div class="max-w-6xl mx-auto px-6 w-full relative z-10">
     <div class="max-w-2xl fade-up">
       <p class="text-sm text-neutral-400 mb-4 tracking-wide uppercase"><%= settings.location %></p>
       <h1 class="text-5xl md:text-6xl font-light leading-tight mb-6 tracking-tight"><%= settings.siteName %></h1>
@@ -81,20 +87,6 @@
     <div class="max-w-3xl mx-auto text-center">
       <h2 class="text-3xl font-light mb-4">Bring the Joy to Your Community</h2>
       <p class="text-neutral-500 mb-8 leading-relaxed">We bring our friendly alpacas and sheep to schools, nursing homes, hospitals, and special events. Our animals love meeting new people.</p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-        <div class="flex items-center gap-3 text-neutral-600">
-          <span class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">🏫</span>
-          <span class="text-sm">Schools</span>
-        </div>
-        <div class="flex items-center gap-3 text-neutral-600">
-          <span class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">🏥</span>
-          <span class="text-sm">Nursing Homes</span>
-        </div>
-        <div class="flex items-center gap-3 text-neutral-600">
-          <span class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">🎉</span>
-          <span class="text-sm">Events</span>
-        </div>
-      </div>
       <a href="/book" class="inline-block bg-neutral-900 text-white px-10 py-4 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Book a Visit</a>
     </div>
   </div>
