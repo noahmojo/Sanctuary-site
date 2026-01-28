@@ -3,20 +3,32 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Cloudinary config
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dru9wjewk',
+  api_key: process.env.CLOUDINARY_API_KEY || '162939922515555',
+  api_secret: process.env.CLOUDINARY_API_SECRET || 'SNX1JYnIoZKE5KxmI_6Fhh3pZTw'
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'sanctuary',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp']
+  }
+});
+const upload = multer({ storage });
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-const storage = multer.diskStorage({
-  destination: './public/uploads/',
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname.replace(/\s/g, '-')}`)
-});
-const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
 const DATA_DIR = './data';
 const ensureData = () => {
@@ -218,7 +230,7 @@ app.post('/admin/animals', upload.array('photos', 10), (req, res) => {
     personality: req.body.personality,
     description: req.body.description,
     chatPersonality: req.body.chatPersonality,
-    photos: req.files ? req.files.map(f => `/uploads/${f.filename}`) : [],
+    photos: req.files ? req.files.map(f => f.path) : [],
     featured: req.body.featured === 'on'
   });
   writeData('animals.json', animals);
@@ -229,7 +241,7 @@ app.post('/admin/animals/:id', upload.array('photos', 10), (req, res) => {
   const animals = readData('animals.json');
   const idx = animals.findIndex(a => a.id === req.params.id);
   if (idx === -1) return res.status(404).send('Not found');
-  const newPhotos = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
+  const newPhotos = req.files ? req.files.map(f => f.path) : [];
   const existingPhotos = req.body.existingPhotos ? (Array.isArray(req.body.existingPhotos) ? req.body.existingPhotos : [req.body.existingPhotos]) : [];
   animals[idx] = { ...animals[idx], name: req.body.name, nickname: req.body.nickname, species: req.body.species, breed: req.body.breed, birthday: req.body.birthday, personality: req.body.personality, description: req.body.description, chatPersonality: req.body.chatPersonality, photos: [...existingPhotos, ...newPhotos], featured: req.body.featured === 'on' };
   writeData('animals.json', animals);
