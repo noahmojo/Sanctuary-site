@@ -1,6 +1,6 @@
 {
   "name": "sierra-alpaca-sanctuary",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "scripts": {
     "start": "node server.js"
   },
@@ -10,7 +10,8 @@
     "ejs": "^3.1.9",
     "uuid": "^9.0.0",
     "cloudinary": "^1.41.0",
-    "multer-storage-cloudinary": "^4.0.0"
+    "multer-storage-cloudinary": "^4.0.0",
+    "pg": "^8.11.3"
   },
   "engines": {
     "node": ">=18"
