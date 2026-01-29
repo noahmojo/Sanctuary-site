@@ -1,41 +1,111 @@
-<%- include('../partials/header', { settings, title: 'Donate' }) %>
+<%- include('../partials/header', { settings, title: 'Support Us' }) %>
 
 <section class="py-16">
-  <div class="max-w-3xl mx-auto px-6">
+  <div class="max-w-5xl mx-auto px-6">
     <div class="text-center mb-12">
-      <h1 class="text-4xl font-light mb-4">Support Our Mission</h1>
-      <p class="text-neutral-500 leading-relaxed">Your donation helps us provide food, veterinary care, and shelter for our rescued alpacas and sheep.</p>
+      <h1 class="text-4xl font-light mb-4">Become a Member</h1>
+      <p class="text-neutral-500 leading-relaxed max-w-2xl mx-auto">Join our sanctuary family and help us continue bringing joy to nursing homes, hospitals, and children with disabilities across the Sierra Nevada foothills.</p>
     </div>
     
-    <div class="bg-neutral-50 rounded-2xl p-8 mb-10">
-      <h2 class="text-xl font-medium mb-4">Making a Difference</h2>
-      <p class="text-neutral-600 leading-relaxed mb-4">Our animals do more than just live at the sanctuary. They visit nursing homes bringing joy and comfort to senior citizens, and spend time with children with disabilities, providing therapeutic connection and unforgettable smiles.</p>
-      <p class="text-neutral-600 leading-relaxed">Every dollar you donate helps us continue this important work in our community.</p>
+    <!-- Membership Tiers -->
+    <div class="grid md:grid-cols-3 gap-6 mb-16">
+      <!-- Sanctuary Member -->
+      <a href="https://www.zeffy.com/en-US/ticketing/sierra-alpaca-sanctuarys-memberships" target="_blank" class="group bg-white border-2 border-neutral-100 hover:border-emerald-500 rounded-2xl p-6 transition-all hover:shadow-lg">
+        <div class="text-center mb-6">
+          <p class="text-3xl mb-2">🌿</p>
+          <h3 class="text-xl font-medium mb-1">Sanctuary Member</h3>
+          <p class="text-3xl font-light text-emerald-600">$50<span class="text-sm text-neutral-400">/year</span></p>
+        </div>
+        <ul class="text-sm text-neutral-600 space-y-3 mb-6">
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Digital membership badge</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Name listed on Sanctuary site</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Quarterly "From the Pasture" updates</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Early notice of events</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Vote on naming new animals</li>
+        </ul>
+        <div class="text-center">
+          <span class="inline-block bg-neutral-100 group-hover:bg-emerald-600 group-hover:text-white text-sm px-6 py-2 rounded-full transition">Join Now →</span>
+        </div>
+      </a>
+      
+      <!-- Shepherds Club -->
+      <a href="https://www.zeffy.com/en-US/ticketing/sierra-alpaca-sanctuarys-memberships" target="_blank" class="group bg-white border-2 border-emerald-500 rounded-2xl p-6 transition-all hover:shadow-lg relative">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+          <span class="bg-emerald-600 text-white text-xs px-3 py-1 rounded-full">Most Popular</span>
+        </div>
+        <div class="text-center mb-6">
+          <p class="text-3xl mb-2">🐑</p>
+          <h3 class="text-xl font-medium mb-1">Shepherds Club</h3>
+          <p class="text-3xl font-light text-emerald-600">$200<span class="text-sm text-neutral-400">/year</span></p>
+        </div>
+        <ul class="text-sm text-neutral-600 space-y-3 mb-6">
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Everything in Sanctuary Member</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Adopt-a-Herd connection</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Annual lunch on the farm</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Printed photo card keepsake</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Priority event access</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Annual fiber token from your herd</li>
+        </ul>
+        <div class="text-center">
+          <span class="inline-block bg-emerald-600 text-white text-sm px-6 py-2 rounded-full group-hover:bg-emerald-700 transition">Join Now →</span>
+        </div>
+      </a>
+      
+      <!-- Wool & Wine Circle -->
+      <a href="https://www.zeffy.com/en-US/ticketing/sierra-alpaca-sanctuarys-memberships" target="_blank" class="group bg-white border-2 border-neutral-100 hover:border-emerald-500 rounded-2xl p-6 transition-all hover:shadow-lg">
+        <div class="text-center mb-6">
+          <p class="text-3xl mb-2">🍷</p>
+          <h3 class="text-xl font-medium mb-1">Wool & Wine Circle</h3>
+          <p class="text-3xl font-light text-emerald-600">$500<span class="text-sm text-neutral-400">/lifetime</span></p>
+        </div>
+        <ul class="text-sm text-neutral-600 space-y-3 mb-6">
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Everything in Shepherds Club</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Shearing Day invitation for 2</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Seasonal ranch dinner or picnic</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> First access to fiber & yarn</li>
+          <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> Personal thank-you video</li>
+        </ul>
+        <div class="text-center">
+          <span class="inline-block bg-neutral-100 group-hover:bg-emerald-600 group-hover:text-white text-sm px-6 py-2 rounded-full transition">Join Now →</span>
+        </div>
+      </a>
     </div>
     
-    <div class="grid md:grid-cols-3 gap-6 mb-10">
-      <div class="bg-white border border-neutral-100 rounded-2xl p-6 text-center">
-        <p class="text-3xl mb-2">🥕</p>
-        <p class="font-medium mb-1">$25</p>
-        <p class="text-sm text-neutral-500">One week of feed for one animal</p>
-      </div>
-      <div class="bg-white border border-neutral-100 rounded-2xl p-6 text-center">
-        <p class="text-3xl mb-2">💊</p>
-        <p class="font-medium mb-1">$75</p>
-        <p class="text-sm text-neutral-500">Monthly medical supplies</p>
-      </div>
-      <div class="bg-white border border-neutral-100 rounded-2xl p-6 text-center">
-        <p class="text-3xl mb-2">🏠</p>
-        <p class="font-medium mb-1">$150</p>
-        <p class="text-sm text-neutral-500">Shelter maintenance</p>
+    <!-- What Members Get - Tiles -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-light text-center mb-8">Member Experiences</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-amber-50 rounded-xl p-5 text-center">
+          <p class="text-2xl mb-2">🍽️</p>
+          <p class="font-medium text-sm">Farm Dinners</p>
+          <p class="text-xs text-neutral-500 mt-1">Local food, beautiful views</p>
+        </div>
+        <div class="bg-emerald-50 rounded-xl p-5 text-center">
+          <p class="text-2xl mb-2">✂️</p>
+          <p class="font-medium text-sm">Shearing Day</p>
+          <p class="text-xs text-neutral-500 mt-1">Hands-on experience</p>
+        </div>
+        <div class="bg-blue-50 rounded-xl p-5 text-center">
+          <p class="text-2xl mb-2">🎟️</p>
+          <p class="font-medium text-sm">Early Access</p>
+          <p class="text-xs text-neutral-500 mt-1">Events & open ranch days</p>
+        </div>
+        <div class="bg-purple-50 rounded-xl p-5 text-center">
+          <p class="text-2xl mb-2">🧶</p>
+          <p class="font-medium text-sm">Fiber Tokens</p>
+          <p class="text-xs text-neutral-500 mt-1">From your adopted herd</p>
+        </div>
       </div>
     </div>
     
-    <div class="text-center">
+    <!-- One-time donation -->
+    <div class="bg-neutral-50 rounded-2xl p-8 text-center">
+      <h2 class="text-xl font-medium mb-3">Prefer a One-Time Gift?</h2>
+      <p class="text-neutral-500 mb-6">Every dollar goes directly to food, veterinary care, and community visits.</p>
       <% if (settings.donateUrl) { %>
-        <a href="<%= settings.donateUrl %>" target="_blank" class="inline-block bg-neutral-900 text-white px-10 py-4 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Donate Now</a>
+        <a href="<%= settings.donateUrl %>" target="_blank" class="inline-block bg-neutral-900 text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Make a Donation</a>
       <% } else { %>
-        <p class="text-neutral-500">Donation link coming soon. Contact us at <%= settings.email || 'the sanctuary' %> to donate directly.</p>
+        <a href="https://www.zeffy.com/en-US/ticketing/sierra-alpaca-sanctuarys-memberships" target="_blank" class="inline-block bg-neutral-900 text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Make a Donation</a>
       <% } %>
     </div>
   </div>
