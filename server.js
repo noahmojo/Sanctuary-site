@@ -54,6 +54,8 @@ async function initDB() {
     CREATE TABLE IF NOT EXISTS settings (
       id INTEGER PRIMARY KEY DEFAULT 1,
       site_name TEXT,
+      header TEXT,
+      subheader TEXT,
       tagline TEXT,
       location TEXT,
       about TEXT,
@@ -80,12 +82,18 @@ async function initDB() {
     )
   `);
 
+  // Add new columns if they don't exist
+  try {
+    await pool.query(`ALTER TABLE settings ADD COLUMN IF NOT EXISTS header TEXT`);
+    await pool.query(`ALTER TABLE settings ADD COLUMN IF NOT EXISTS subheader TEXT`);
+  } catch (e) {}
+
   // Seed settings if empty
   const settingsCheck = await pool.query('SELECT * FROM settings WHERE id = 1');
   if (settingsCheck.rows.length === 0) {
     await pool.query(`
-      INSERT INTO settings (id, site_name, tagline, location, about, hero_image, donate_url, email, phone)
-      VALUES (1, 'Sierra Alpaca Sanctuary', 'Where every animal finds love', 'Camino, California', 
+      INSERT INTO settings (id, site_name, header, subheader, tagline, location, about, hero_image, donate_url, email, phone)
+      VALUES (1, 'Sierra Alpaca Sanctuary', 'Sierra Alpaca Sanctuary', 'Where every animal finds love', 'Where every animal finds love', 'Camino, California', 
       'Nestled in the Sierra Nevada foothills, we provide a forever home for alpacas, sheep, and other barnyard friends.', '', '', '', '')
     `);
   }
@@ -151,6 +159,8 @@ const formatAnimal = (row) => ({
 
 const formatSettings = (row) => ({
   siteName: row.site_name,
+  header: row.header || row.site_name,
+  subheader: row.subheader || row.tagline,
   tagline: row.tagline,
   location: row.location,
   about: row.about,
@@ -174,7 +184,7 @@ app.get('/animals', async (req, res) => {
   if (species) animals = animals.filter(a => a.species === species);
   if (sort === 'age') animals.sort((a, b) => new Date(a.birthday) - new Date(b.birthday));
   if (sort === 'name') animals.sort((a, b) => a.name.localeCompare(b.name));
-  const speciesList = [...new Set(animals.map(a => a.species))];
+  const speciesList = [...new Set((await pool.query('SELECT * FROM animals')).rows.map(a => a.species))];
   res.render('public/animals', { animals, settings, speciesList, currentSpecies: species, currentSort: sort });
 });
 
@@ -305,8 +315,8 @@ app.post('/admin/settings', upload.single('heroImage'), async (req, res) => {
   let heroImage = req.body.existingHeroImage || current?.hero_image || '';
   if (req.file) heroImage = req.file.path;
   await pool.query(
-    'UPDATE settings SET site_name=$1, tagline=$2, location=$3, about=$4, hero_image=$5, donate_url=$6, email=$7, phone=$8 WHERE id=1',
-    [req.body.siteName, req.body.tagline, req.body.location, req.body.about, heroImage, req.body.donateUrl, req.body.email, req.body.phone]
+    'UPDATE settings SET site_name=$1, header=$2, subheader=$3, tagline=$4, location=$5, about=$6, hero_image=$7, donate_url=$8, email=$9, phone=$10 WHERE id=1',
+    [req.body.siteName, req.body.header, req.body.subheader, req.body.tagline, req.body.location, req.body.about, heroImage, req.body.donateUrl, req.body.email, req.body.phone]
   );
   res.redirect('/admin/settings');
 });
