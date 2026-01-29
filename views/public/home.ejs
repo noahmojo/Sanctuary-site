@@ -11,35 +11,11 @@
   <div class="max-w-6xl mx-auto px-6 w-full relative z-10">
     <div class="max-w-2xl fade-up">
       <p class="text-sm text-neutral-400 mb-4 tracking-wide uppercase"><%= settings.location %></p>
-      <h1 class="text-5xl md:text-6xl font-light leading-tight mb-6 tracking-tight"><%= settings.siteName %></h1>
-      <p class="text-xl text-neutral-500 leading-relaxed mb-10"><%= settings.tagline %>. Home to <%= animals.length %> alpacas and sheep, each with their own story.</p>
+      <h1 class="text-5xl md:text-6xl font-light leading-tight mb-6 tracking-tight"><%= settings.header || settings.siteName %></h1>
+      <p class="text-xl text-neutral-500 leading-relaxed mb-10"><%= settings.subheader || settings.tagline %></p>
       <div class="flex gap-4">
         <a href="/animals" class="bg-neutral-900 text-white px-8 py-4 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Meet the Animals</a>
         <a href="/book" class="border border-neutral-200 px-8 py-4 rounded-full text-sm font-medium hover:border-neutral-400 transition">Book a Visit</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Stats -->
-<section class="py-20 border-y border-neutral-100">
-  <div class="max-w-6xl mx-auto px-6">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-      <div>
-        <p class="text-4xl font-light mb-1"><%= animals.length %></p>
-        <p class="text-neutral-400 text-sm">Animals</p>
-      </div>
-      <div>
-        <p class="text-4xl font-light mb-1"><%= animals.filter(a => a.species === 'Alpaca').length %></p>
-        <p class="text-neutral-400 text-sm">Alpacas</p>
-      </div>
-      <div>
-        <p class="text-4xl font-light mb-1"><%= animals.filter(a => a.species === 'Sheep').length %></p>
-        <p class="text-neutral-400 text-sm">Sheep</p>
-      </div>
-      <div>
-        <p class="text-4xl font-light mb-1">∞</p>
-        <p class="text-neutral-400 text-sm">Love</p>
       </div>
     </div>
   </div>
