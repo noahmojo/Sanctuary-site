@@ -22,6 +22,7 @@
     <div>
       <label class="block text-sm font-medium mb-1.5">Tagline</label>
       <input type="text" name="tagline" value="<%= settings.tagline %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+      <p class="text-xs text-neutral-400 mt-1">Used in footer and meta description</p>
     </div>
     
     <div>
@@ -42,8 +43,14 @@
     </div>
     
     <div>
-      <label class="block text-sm font-medium mb-1.5">About Text</label>
-      <textarea name="about" rows="4" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm resize-none"><%= settings.about %></textarea>
+      <label class="block text-sm font-medium mb-1.5">Short About (for previews)</label>
+      <textarea name="about" rows="2" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm resize-none"><%= settings.about %></textarea>
+    </div>
+    
+    <div>
+      <label class="block text-sm font-medium mb-1.5">About Page Content</label>
+      <textarea name="aboutContent" rows="8" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm resize-none"><%= settings.aboutContent || settings.about %></textarea>
+      <p class="text-xs text-neutral-400 mt-1">Full content shown on the About Us page. Use blank lines for paragraphs.</p>
     </div>
     
     <div>
