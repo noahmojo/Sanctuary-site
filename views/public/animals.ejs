@@ -3,45 +3,34 @@
 <section class="py-16">
   <div class="max-w-6xl mx-auto px-6">
     <div class="text-center mb-12">
-      <h1 class="text-4xl font-light mb-3">Our Animals</h1>
-      <p class="text-neutral-500"><%= animals.length %> residents call the sanctuary home</p>
+      <h1 class="text-4xl font-light mb-3">Featured Animals</h1>
+      <p class="text-neutral-500">Click on any animal to learn more or start a conversation</p>
     </div>
     
-    <div class="flex justify-center gap-4 mb-12">
-      <form method="GET" class="flex gap-3">
-        <select name="species" onchange="this.form.submit()" class="bg-neutral-50 border-0 rounded-full px-5 py-2.5 text-sm">
-          <option value="">All Species</option>
-          <% speciesList.forEach(s => { %>
-            <option value="<%= s %>" <%= currentSpecies === s ? 'selected' : '' %>><%= s %>s</option>
-          <% }); %>
-        </select>
-        <select name="sort" onchange="this.form.submit()" class="bg-neutral-50 border-0 rounded-full px-5 py-2.5 text-sm">
-          <option value="">Sort</option>
-          <option value="name" <%= currentSort === 'name' ? 'selected' : '' %>>Name</option>
-          <option value="age" <%= currentSort === 'age' ? 'selected' : '' %>>Age</option>
-        </select>
-        <% if (currentSpecies || currentSort) { %>
-          <a href="/animals" class="text-neutral-400 hover:text-neutral-600 text-sm flex items-center">Clear</a>
-        <% } %>
-      </form>
+    <div class="flex justify-center gap-4 mb-10 flex-wrap">
+      <a href="/animals" class="px-4 py-2 rounded-full text-sm <%= !currentSpecies ? 'bg-neutral-900 text-white' : 'bg-neutral-100 hover:bg-neutral-200' %> transition">All</a>
+      <% speciesList.forEach(s => { %>
+        <a href="/animals?species=<%= s %>" class="px-4 py-2 rounded-full text-sm <%= currentSpecies === s ? 'bg-neutral-900 text-white' : 'bg-neutral-100 hover:bg-neutral-200' %> transition"><%= s %></a>
+      <% }); %>
     </div>
     
-    <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-5">
+    <div class="grid md:grid-cols-3 gap-6">
       <% animals.forEach(animal => { %>
         <div class="group hover-lift bg-white rounded-2xl overflow-hidden border border-neutral-100">
-          <div class="aspect-square bg-neutral-100 overflow-hidden">
+          <div class="aspect-[4/3] bg-neutral-100 overflow-hidden">
             <% if (animal.photos && animal.photos.length > 0) { %>
               <img src="<%= animal.photos[0] %>" alt="<%= animal.name %>" class="w-full h-full object-cover">
             <% } else { %>
-              <div class="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-amber-50 to-emerald-50"><%= animal.species === 'Alpaca' ? '🦙' : '🐑' %></div>
+              <div class="w-full h-full flex items-center justify-center text-6xl bg-gradient-to-br from-amber-50 to-emerald-50"><%= animal.species === 'Alpaca' ? '🦙' : '🐑' %></div>
             <% } %>
           </div>
-          <div class="p-4">
-            <h3 class="font-medium mb-1"><%= animal.name %></h3>
-            <p class="text-neutral-400 text-xs mb-3"><%= animal.breed %> · <%= calcAge(animal.birthday) %></p>
+          <div class="p-5">
+            <h3 class="font-medium text-lg mb-1"><%= animal.name %></h3>
+            <p class="text-neutral-400 text-sm mb-3"><%= animal.breed %> · <%= calcAge(animal.birthday) %></p>
+            <p class="text-neutral-500 text-sm mb-4"><%= animal.personality %></p>
             <div class="flex gap-2">
-              <a href="/animal/<%= animal.id %>" class="flex-1 text-center text-xs py-2 text-neutral-600 hover:bg-neutral-50 rounded-lg transition">Profile</a>
-              <a href="/chat/<%= animal.id %>" class="flex-1 text-center text-xs py-2 bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition">Chat</a>
+              <a href="/animal/<%= animal.id %>" class="flex-1 text-center text-sm py-2 border border-neutral-200 rounded-full hover:border-neutral-400 transition">Profile</a>
+              <a href="/chat/<%= animal.id %>" class="flex-1 text-center text-sm py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition">Chat</a>
             </div>
           </div>
         </div>
