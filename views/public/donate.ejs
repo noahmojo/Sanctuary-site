@@ -3,47 +3,40 @@
 <section class="py-16">
   <div class="max-w-3xl mx-auto px-6">
     <div class="text-center mb-12">
-      <h1 class="text-4xl font-light mb-3">Support the Sanctuary</h1>
-      <p class="text-neutral-500">Your donation directly supports our animals' care</p>
+      <h1 class="text-4xl font-light mb-4">Support Our Mission</h1>
+      <p class="text-neutral-500 leading-relaxed">Your donation helps us provide food, veterinary care, and shelter for our rescued alpacas and sheep.</p>
     </div>
     
-    <div class="grid md:grid-cols-3 gap-4 mb-12">
-      <div class="bg-neutral-50 rounded-2xl p-6 text-center">
-        <div class="text-3xl mb-3">🌾</div>
-        <p class="text-2xl font-light mb-1">$25</p>
-        <p class="text-sm text-neutral-500">Feeds an animal for a week</p>
+    <div class="bg-neutral-50 rounded-2xl p-8 mb-10">
+      <h2 class="text-xl font-medium mb-4">Making a Difference</h2>
+      <p class="text-neutral-600 leading-relaxed mb-4">Our animals do more than just live at the sanctuary. They visit nursing homes bringing joy and comfort to senior citizens, and spend time with children with disabilities, providing therapeutic connection and unforgettable smiles.</p>
+      <p class="text-neutral-600 leading-relaxed">Every dollar you donate helps us continue this important work in our community.</p>
+    </div>
+    
+    <div class="grid md:grid-cols-3 gap-6 mb-10">
+      <div class="bg-white border border-neutral-100 rounded-2xl p-6 text-center">
+        <p class="text-3xl mb-2">🥕</p>
+        <p class="font-medium mb-1">$25</p>
+        <p class="text-sm text-neutral-500">One week of feed for one animal</p>
       </div>
-      <div class="bg-neutral-50 rounded-2xl p-6 text-center">
-        <div class="text-3xl mb-3">💊</div>
-        <p class="text-2xl font-light mb-1">$75</p>
-        <p class="text-sm text-neutral-500">Covers a vet checkup</p>
+      <div class="bg-white border border-neutral-100 rounded-2xl p-6 text-center">
+        <p class="text-3xl mb-2">💊</p>
+        <p class="font-medium mb-1">$75</p>
+        <p class="text-sm text-neutral-500">Monthly medical supplies</p>
       </div>
-      <div class="bg-neutral-50 rounded-2xl p-6 text-center">
-        <div class="text-3xl mb-3">🏠</div>
-        <p class="text-2xl font-light mb-1">$150</p>
-        <p class="text-sm text-neutral-500">Monthly shelter costs</p>
+      <div class="bg-white border border-neutral-100 rounded-2xl p-6 text-center">
+        <p class="text-3xl mb-2">🏠</p>
+        <p class="font-medium mb-1">$150</p>
+        <p class="text-sm text-neutral-500">Shelter maintenance</p>
       </div>
     </div>
     
-    <div class="bg-white border border-neutral-100 rounded-2xl p-8 text-center">
-      <h2 class="text-xl font-medium mb-4">Make a Donation</h2>
+    <div class="text-center">
       <% if (settings.donateUrl) { %>
-        <a href="<%= settings.donateUrl %>" target="_blank" class="inline-block bg-neutral-900 text-white px-12 py-4 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Donate Online</a>
+        <a href="<%= settings.donateUrl %>" target="_blank" class="inline-block bg-neutral-900 text-white px-10 py-4 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Donate Now</a>
       <% } else { %>
-        <p class="text-neutral-500 mb-4">Contact us to donate:</p>
-        <p class="font-medium"><%= settings.siteName %></p>
-        <p class="text-neutral-400 text-sm"><%= settings.location %></p>
+        <p class="text-neutral-500">Donation link coming soon. Contact us at <%= settings.email || 'the sanctuary' %> to donate directly.</p>
       <% } %>
-    </div>
-    
-    <div class="mt-12 text-center">
-      <h3 class="font-medium mb-4">Other Ways to Help</h3>
-      <div class="flex flex-wrap justify-center gap-4">
-        <span class="bg-neutral-50 px-4 py-2 rounded-full text-sm text-neutral-600">Volunteer</span>
-        <span class="bg-neutral-50 px-4 py-2 rounded-full text-sm text-neutral-600">Sponsor an Animal</span>
-        <span class="bg-neutral-50 px-4 py-2 rounded-full text-sm text-neutral-600">Donate Supplies</span>
-        <span class="bg-neutral-50 px-4 py-2 rounded-full text-sm text-neutral-600">Spread the Word</span>
-      </div>
     </div>
   </div>
 </section>
