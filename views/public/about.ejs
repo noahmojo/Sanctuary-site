@@ -13,15 +13,15 @@
     
     <div class="grid md:grid-cols-3 gap-8 mb-16">
       <div class="text-center">
-        <p class="text-4xl font-light text-emerald-600 mb-2"><%= animals.length %></p>
+        <p class="text-4xl font-light text-emerald-600 mb-2"><%= animals.length + 50 %></p>
         <p class="text-neutral-500">Rescued Animals</p>
       </div>
       <div class="text-center">
-        <p class="text-4xl font-light text-emerald-600 mb-2"><%= animals.filter(a => a.species === 'Alpaca').length %></p>
+        <p class="text-4xl font-light text-emerald-600 mb-2"><%= animals.filter(a => a.species === 'Alpaca').length + 10 %></p>
         <p class="text-neutral-500">Alpacas</p>
       </div>
       <div class="text-center">
-        <p class="text-4xl font-light text-emerald-600 mb-2"><%= animals.filter(a => a.species === 'Sheep').length %></p>
+        <p class="text-4xl font-light text-emerald-600 mb-2"><%= animals.filter(a => a.species === 'Sheep').length + 40 %></p>
         <p class="text-neutral-500">Sheep</p>
       </div>
     </div>
