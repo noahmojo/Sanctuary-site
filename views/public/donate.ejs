@@ -5,6 +5,9 @@
     <div class="text-center mb-12">
       <h1 class="text-4xl font-light mb-4">Become a Member</h1>
       <p class="text-neutral-500 leading-relaxed max-w-2xl mx-auto">Join our sanctuary family and help us continue bringing joy to nursing homes, hospitals, and children with disabilities across the Sierra Nevada foothills.</p>
+      <div class="mt-4 inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm">
+        <span>✓</span> 501(c)(3) Nonprofit — All donations are tax-deductible
+      </div>
     </div>
     
     <!-- Membership Tiers -->
@@ -101,12 +104,19 @@
     <!-- One-time donation -->
     <div class="bg-neutral-50 rounded-2xl p-8 text-center">
       <h2 class="text-xl font-medium mb-3">Prefer a One-Time Gift?</h2>
-      <p class="text-neutral-500 mb-6">Every dollar goes directly to food, veterinary care, and community visits.</p>
+      <p class="text-neutral-500 mb-2">Every dollar goes directly to food, veterinary care, and community visits.</p>
+      <p class="text-sm text-emerald-600 mb-6">100% tax-deductible as allowed by law</p>
       <% if (settings.donateUrl) { %>
         <a href="<%= settings.donateUrl %>" target="_blank" class="inline-block bg-neutral-900 text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Make a Donation</a>
       <% } else { %>
         <a href="https://www.zeffy.com/en-US/ticketing/sierra-alpaca-sanctuarys-memberships" target="_blank" class="inline-block bg-neutral-900 text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Make a Donation</a>
       <% } %>
+    </div>
+    
+    <!-- Tax info -->
+    <div class="mt-8 text-center text-sm text-neutral-500">
+      <p>Sierra Alpaca Sanctuary is a registered 501(c)(3) nonprofit organization.</p>
+      <p>EIN: XX-XXXXXXX · Your donation is tax-deductible to the fullest extent allowed by law.</p>
     </div>
   </div>
 </section>
