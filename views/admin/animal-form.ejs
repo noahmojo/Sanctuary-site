@@ -3,71 +3,109 @@
 <div class="max-w-2xl mx-auto">
   <h1 class="text-2xl font-light mb-8"><%= animal ? 'Edit' : 'Add' %> Animal</h1>
   
-  <form method="POST" action="<%= animal ? '/admin/animals/' + animal.id : '/admin/animals' %>" enctype="multipart/form-data" class="bg-white rounded-xl p-6 space-y-5">
-    <div>
-      <label class="block text-sm font-medium mb-1.5">Name *</label>
-      <input type="text" name="name" value="<%= animal?.name || '' %>" required class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
-    </div>
-    
-    <div>
-      <label class="block text-sm font-medium mb-1.5">Nickname</label>
-      <input type="text" name="nickname" value="<%= animal?.nickname || '' %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm" placeholder="Optional">
+  <form method="POST" action="/admin/animals<%= animal ? '/' + animal.id : '' %>" enctype="multipart/form-data" class="bg-white rounded-xl p-6 space-y-5">
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium mb-1.5">Name *</label>
+        <input type="text" name="name" value="<%= animal ? animal.name : '' %>" required class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1.5">Nickname</label>
+        <input type="text" name="nickname" value="<%= animal ? animal.nickname : '' %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+      </div>
     </div>
     
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium mb-1.5">Species</label>
-        <input type="text" name="species" value="<%= animal?.species || '' %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm" placeholder="Alpaca, Sheep...">
+        <label class="block text-sm font-medium mb-1.5">Species *</label>
+        <select name="species" required class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+          <option value="Alpaca" <%= animal && animal.species === 'Alpaca' ? 'selected' : '' %>>Alpaca</option>
+          <option value="Sheep" <%= animal && animal.species === 'Sheep' ? 'selected' : '' %>>Sheep</option>
+        </select>
       </div>
       <div>
         <label class="block text-sm font-medium mb-1.5">Breed</label>
-        <input type="text" name="breed" value="<%= animal?.breed || '' %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm" placeholder="Huacaya, Dorper...">
+        <input type="text" name="breed" value="<%= animal ? animal.breed : '' %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium mb-1.5">Birthday</label>
+        <input type="date" name="birthday" value="<%= animal ? animal.birthday : '' %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+      </div>
+      <div class="flex items-end">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" name="featured" <%= animal && animal.featured ? 'checked' : '' %> class="w-4 h-4 rounded">
+          <span class="text-sm">Featured on homepage</span>
+        </label>
       </div>
     </div>
     
     <div>
-      <label class="block text-sm font-medium mb-1.5">Birthday</label>
-      <input type="date" name="birthday" value="<%= animal?.birthday || '' %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
-      <% if (animal?.birthday) { %><p class="text-xs text-emerald-600 mt-1">Age: <%= calcAge(animal.birthday) %></p><% } %>
-    </div>
-    
-    <div>
-      <label class="block text-sm font-medium mb-1.5">Personality (short tagline)</label>
-      <input type="text" name="personality" value="<%= animal?.personality || '' %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm" placeholder="Gentle and curious...">
+      <label class="block text-sm font-medium mb-1.5">Personality (short)</label>
+      <input type="text" name="personality" value="<%= animal ? animal.personality : '' %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm" placeholder="e.g., Curious and bouncy explorer">
     </div>
     
     <div>
       <label class="block text-sm font-medium mb-1.5">Description</label>
-      <textarea name="description" rows="3" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm resize-none"><%= animal?.description || '' %></textarea>
+      <textarea name="description" rows="3" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm resize-none"><%= animal ? animal.description : '' %></textarea>
     </div>
     
     <div>
-      <label class="block text-sm font-medium mb-1.5">Chat Personality (for AI chat)</label>
-      <textarea name="chatPersonality" rows="2" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm resize-none" placeholder="Describe how they talk - e.g. shy, excitable, wise, uses lots of exclamation marks..."><%= animal?.chatPersonality || '' %></textarea>
+      <label class="block text-sm font-medium mb-1.5">Chat Personality</label>
+      <textarea name="chatPersonality" rows="2" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm resize-none" placeholder="Keywords for chat: shy, energetic, wise, playful..."><%= animal ? animal.chatPersonality : '' %></textarea>
     </div>
     
     <div>
       <label class="block text-sm font-medium mb-1.5">Photos</label>
-      <% if (animal?.photos && animal.photos.length > 0) { %>
-        <div class="grid grid-cols-4 gap-2 mb-3">
-          <% animal.photos.forEach(p => { %>
-            <div class="relative"><img src="<%= p %>" class="w-full h-16 object-cover rounded-lg"><input type="hidden" name="existingPhotos" value="<%= p %>"></div>
+      <% if (animal && animal.photos && animal.photos.length > 0) { %>
+        <div class="grid grid-cols-4 gap-3 mb-3">
+          <% animal.photos.forEach((photo, index) => { %>
+            <div class="relative group">
+              <img src="<%= photo %>" class="w-full aspect-square object-cover rounded-lg">
+              <label class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center cursor-pointer rounded-lg">
+                <input type="checkbox" name="deletePhotos" value="<%= photo %>" class="sr-only peer">
+                <span class="text-white text-xs peer-checked:hidden">Click to delete</span>
+                <span class="text-red-400 text-xs hidden peer-checked:block">Will delete ✕</span>
+              </label>
+              <input type="hidden" name="existingPhotos" value="<%= photo %>" class="photo-hidden" data-photo="<%= photo %>">
+            </div>
           <% }); %>
         </div>
+        <p class="text-xs text-neutral-400 mb-3">Hover and click photos to mark for deletion</p>
       <% } %>
-      <input type="file" name="photos" accept="image/*" multiple class="w-full text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-50 file:text-emerald-700">
+      <input type="file" name="photos" multiple accept="image/*" class="w-full text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-50 file:text-emerald-700">
     </div>
     
-    <div class="flex items-center gap-2">
-      <input type="checkbox" name="featured" id="featured" <%= animal?.featured ? 'checked' : '' %> class="rounded">
-      <label for="featured" class="text-sm">Feature on homepage</label>
-    </div>
-    
-    <div class="flex justify-between pt-4 border-t">
-      <a href="/admin/animals" class="text-neutral-400 text-sm hover:text-neutral-600">Cancel</a>
-      <button type="submit" class="bg-emerald-600 text-white px-6 py-2.5 rounded-lg text-sm hover:bg-emerald-700 transition"><%= animal ? 'Update' : 'Create' %></button>
+    <div class="pt-4 border-t flex gap-3">
+      <button type="submit" class="bg-emerald-600 text-white px-6 py-2.5 rounded-lg text-sm hover:bg-emerald-700 transition">Save Animal</button>
+      <a href="/admin/animals" class="px-6 py-2.5 rounded-lg text-sm border border-neutral-200 hover:border-neutral-400 transition">Cancel</a>
     </div>
   </form>
+  
+  <% if (animal) { %>
+    <form method="POST" action="/admin/animals/<%= animal.id %>/delete" class="mt-6" onsubmit="return confirm('Are you sure you want to delete this animal?')">
+      <button type="submit" class="text-red-600 text-sm hover:text-red-700">Delete this animal</button>
+    </form>
+  <% } %>
+</div>
+
+<script>
+document.querySelectorAll('input[name="deletePhotos"]').forEach(checkbox => {
+  checkbox.addEventListener('change', function() {
+    const photo = this.value;
+    const hiddenInput = document.querySelector(`.photo-hidden[data-photo="${photo}"]`);
+    if (this.checked) {
+      hiddenInput.disabled = true;
+    } else {
+      hiddenInput.disabled = false;
+    }
+  });
+});
+</script>
+
+<%- include('../partials/admin-footer') %>
 </div>
 
 <%- include('../partials/admin-footer') %>
