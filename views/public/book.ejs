@@ -1,147 +1,127 @@
 <%- include('../partials/header', { settings, title: 'Book a Visit' }) %>
 
 <section class="py-16">
-  <div class="max-w-3xl mx-auto px-6">
+  <div class="max-w-4xl mx-auto px-6">
     <div class="text-center mb-12">
-      <h1 class="text-4xl font-light mb-3">Book a Visit</h1>
-      <p class="text-neutral-500">Select the type of visit you're interested in</p>
+      <h1 class="text-4xl font-light mb-4">Book a Visit</h1>
+      <p class="text-neutral-500 leading-relaxed max-w-2xl mx-auto mb-4">We bring our alpacas and sheep to schools, nursing homes, hospitals, and special events throughout El Dorado County and surrounding areas.</p>
+      <p class="text-neutral-600 leading-relaxed max-w-2xl mx-auto">We schedule 1-2 community visits each month. If you'd like us to visit your school, nursing home, or other event, please connect below.</p>
     </div>
     
     <% if (success) { %>
-      <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 mb-8 text-center">
-        <p class="text-emerald-700 font-medium mb-2">✓ Request Submitted!</p>
-        <p class="text-emerald-600 text-sm">We'll be in touch within 24-48 hours to confirm details.</p>
+      <div class="bg-emerald-50 text-emerald-700 px-6 py-4 rounded-xl mb-8 text-center">
+        Thank you! We'll be in touch within 24-48 hours.
       </div>
     <% } %>
     
-    <!-- Visit Type Tiles -->
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-      <button type="button" onclick="selectType('school')" data-type="school" class="tile-btn group p-6 rounded-2xl border-2 border-neutral-100 hover:border-neutral-900 transition-all text-center">
-        <div class="text-3xl mb-3">🏫</div>
-        <p class="font-medium text-sm">School</p>
-        <p class="text-xs text-neutral-400">Educational visits</p>
+    <p class="text-center text-neutral-500 mb-8">Select the type of visit you're interested in</p>
+    
+    <div id="visit-types" class="grid md:grid-cols-3 gap-4 mb-8">
+      <button type="button" class="visit-tile group border-2 border-neutral-100 rounded-xl p-6 text-center hover:border-neutral-300 transition" data-type="School">
+        <p class="text-3xl mb-3">🏫</p>
+        <p class="font-medium">School</p>
+        <p class="text-sm text-neutral-400">Educational visits</p>
       </button>
-      
-      <button type="button" onclick="selectType('nursing')" data-type="nursing" class="tile-btn group p-6 rounded-2xl border-2 border-neutral-100 hover:border-neutral-900 transition-all text-center">
-        <div class="text-3xl mb-3">🏥</div>
-        <p class="font-medium text-sm">Nursing Home</p>
-        <p class="text-xs text-neutral-400">Assisted living</p>
+      <button type="button" class="visit-tile group border-2 border-neutral-100 rounded-xl p-6 text-center hover:border-neutral-300 transition" data-type="Nursing Home">
+        <p class="text-3xl mb-3">🏥</p>
+        <p class="font-medium">Nursing Home</p>
+        <p class="text-sm text-neutral-400">Assisted living</p>
       </button>
-      
-      <button type="button" onclick="selectType('hospital')" data-type="hospital" class="tile-btn group p-6 rounded-2xl border-2 border-neutral-100 hover:border-neutral-900 transition-all text-center">
-        <div class="text-3xl mb-3">⚕️</div>
-        <p class="font-medium text-sm">Hospital</p>
-        <p class="text-xs text-neutral-400">Medical facility</p>
+      <button type="button" class="visit-tile group border-2 border-neutral-100 rounded-xl p-6 text-center hover:border-neutral-300 transition" data-type="Hospital">
+        <p class="text-3xl mb-3">⚕️</p>
+        <p class="font-medium">Hospital</p>
+        <p class="text-sm text-neutral-400">Medical facility</p>
       </button>
-      
-      <button type="button" onclick="selectType('event')" data-type="event" class="tile-btn group p-6 rounded-2xl border-2 border-neutral-100 hover:border-neutral-900 transition-all text-center">
-        <div class="text-3xl mb-3">🎉</div>
-        <p class="font-medium text-sm">Private Event</p>
-        <p class="text-xs text-neutral-400">Parties & celebrations</p>
+      <button type="button" class="visit-tile group border-2 border-neutral-100 rounded-xl p-6 text-center hover:border-neutral-300 transition" data-type="Private Event">
+        <p class="text-3xl mb-3">🎉</p>
+        <p class="font-medium">Private Event</p>
+        <p class="text-sm text-neutral-400">Parties & celebrations</p>
       </button>
-      
-      <button type="button" onclick="selectType('corporate')" data-type="corporate" class="tile-btn group p-6 rounded-2xl border-2 border-neutral-100 hover:border-neutral-900 transition-all text-center">
-        <div class="text-3xl mb-3">🏢</div>
-        <p class="font-medium text-sm">Corporate</p>
-        <p class="text-xs text-neutral-400">Team building</p>
+      <button type="button" class="visit-tile group border-2 border-neutral-100 rounded-xl p-6 text-center hover:border-neutral-300 transition" data-type="Corporate">
+        <p class="text-3xl mb-3">🏢</p>
+        <p class="font-medium">Corporate</p>
+        <p class="text-sm text-neutral-400">Team building</p>
       </button>
-      
-      <button type="button" onclick="selectType('other')" data-type="other" class="tile-btn group p-6 rounded-2xl border-2 border-neutral-100 hover:border-neutral-900 transition-all text-center">
-        <div class="text-3xl mb-3">✨</div>
-        <p class="font-medium text-sm">Other</p>
-        <p class="text-xs text-neutral-400">Something else</p>
+      <button type="button" class="visit-tile group border-2 border-neutral-100 rounded-xl p-6 text-center hover:border-neutral-300 transition" data-type="Other">
+        <p class="text-3xl mb-3">✨</p>
+        <p class="font-medium">Other</p>
+        <p class="text-sm text-neutral-400">Something else</p>
       </button>
     </div>
     
-    <!-- Contact Form (hidden until tile selected) -->
-    <form id="booking-form" method="POST" action="/book" class="hidden opacity-0 transition-all duration-500 space-y-6">
-      <input type="hidden" name="type" id="selected-type" value="">
+    <form id="booking-form" method="POST" action="/book" class="hidden bg-white rounded-2xl border border-neutral-100 p-8 space-y-5">
+      <input type="hidden" name="type" id="visit-type">
       
-      <div class="bg-neutral-50 rounded-2xl p-6 mb-2">
-        <p class="text-sm text-neutral-500">Selected: <span id="selected-label" class="font-medium text-neutral-900"></span></p>
+      <div id="selected-type" class="text-center pb-5 border-b border-neutral-100">
+        <span class="inline-block bg-emerald-50 text-emerald-700 px-4 py-1.5 rounded-full text-sm font-medium"></span>
+      </div>
+      
+      <div class="grid md:grid-cols-2 gap-5">
+        <div>
+          <label class="block text-sm font-medium mb-1.5">Organization Name *</label>
+          <input type="text" name="organization" required class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1.5">Contact Person *</label>
+          <input type="text" name="contact" required class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+        </div>
+      </div>
+      
+      <div class="grid md:grid-cols-2 gap-5">
+        <div>
+          <label class="block text-sm font-medium mb-1.5">Email *</label>
+          <input type="email" name="email" required class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1.5">Phone</label>
+          <input type="tel" name="phone" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+        </div>
+      </div>
+      
+      <div class="grid md:grid-cols-2 gap-5">
+        <div>
+          <label class="block text-sm font-medium mb-1.5">Preferred Date</label>
+          <input type="date" name="date" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1.5">Expected Attendees</label>
+          <input type="text" name="attendees" placeholder="e.g., 20-30 students" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+        </div>
       </div>
       
       <div>
-        <label class="block text-sm font-medium mb-2">Organization Name</label>
-        <input type="text" name="organization" required class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20" placeholder="School, facility, or company name">
+        <label class="block text-sm font-medium mb-1.5">Tell us about your event</label>
+        <textarea name="message" rows="4" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm resize-none" placeholder="Any details about your venue, audience, or special requests..."></textarea>
       </div>
       
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium mb-2">Contact Name</label>
-          <input type="text" name="contact" required class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20">
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-2">Phone</label>
-          <input type="tel" name="phone" class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20">
-        </div>
+      <div class="pt-4">
+        <button type="submit" class="w-full bg-emerald-600 text-white py-3 rounded-lg text-sm font-medium hover:bg-emerald-700 transition">Submit Request</button>
       </div>
-      
-      <div>
-        <label class="block text-sm font-medium mb-2">Email</label>
-        <input type="email" name="email" required class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20">
-      </div>
-      
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium mb-2">Preferred Date</label>
-          <input type="date" name="date" required class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20">
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-2">Expected Attendees</label>
-          <input type="number" name="attendees" min="1" class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20" placeholder="Approx number">
-        </div>
-      </div>
-      
-      <div>
-        <label class="block text-sm font-medium mb-2">Additional Information</label>
-        <textarea name="message" rows="4" class="w-full bg-neutral-50 border-0 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500/20 resize-none" placeholder="Tell us about your event, any special requests, or questions..."></textarea>
-      </div>
-      
-      <button type="submit" class="w-full bg-neutral-900 text-white py-4 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Submit Request</button>
     </form>
     
-    <p class="text-center text-neutral-400 text-xs mt-6">We typically respond within 24-48 hours</p>
+    <p class="text-center text-neutral-400 text-sm mt-8">We typically respond within 24-48 hours</p>
   </div>
 </section>
 
 <script>
-const labels = {
-  school: 'School / Educational',
-  nursing: 'Nursing Home / Assisted Living',
-  hospital: 'Hospital / Medical Facility',
-  event: 'Private Event / Party',
-  corporate: 'Corporate Event',
-  other: 'Other'
-};
-
-function selectType(type) {
-  // Update hidden input
-  document.getElementById('selected-type').value = type;
-  document.getElementById('selected-label').textContent = labels[type];
-  
-  // Update tile styles
-  document.querySelectorAll('.tile-btn').forEach(btn => {
-    btn.classList.remove('border-neutral-900', 'bg-neutral-50');
-    btn.classList.add('border-neutral-100');
+document.querySelectorAll('.visit-tile').forEach(tile => {
+  tile.addEventListener('click', function() {
+    const type = this.dataset.type;
+    document.getElementById('visit-type').value = type;
+    document.querySelector('#selected-type span').textContent = type;
+    
+    document.querySelectorAll('.visit-tile').forEach(t => {
+      t.classList.remove('border-neutral-900', 'bg-neutral-50');
+      t.classList.add('border-neutral-100');
+    });
+    this.classList.remove('border-neutral-100');
+    this.classList.add('border-neutral-900', 'bg-neutral-50');
+    
+    const form = document.getElementById('booking-form');
+    form.classList.remove('hidden');
+    setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
   });
-  const selected = document.querySelector(`[data-type="${type}"]`);
-  selected.classList.remove('border-neutral-100');
-  selected.classList.add('border-neutral-900', 'bg-neutral-50');
-  
-  // Show form with animation
-  const form = document.getElementById('booking-form');
-  form.classList.remove('hidden');
-  setTimeout(() => {
-    form.classList.remove('opacity-0');
-    form.classList.add('opacity-100');
-  }, 10);
-  
-  // Scroll to form
-  setTimeout(() => {
-    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
-}
+});
 </script>
 
 <%- include('../partials/footer', { settings }) %>
