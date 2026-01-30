@@ -38,11 +38,552 @@ app.use(session({
   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// Auth middleware
 function requireAdmin(req, res, next) {
   if (req.session.isAdmin) return next();
   res.redirect('/admin/login');
 }
+
+// ===========================================
+// KNOWLEDGE BASE
+// ===========================================
+
+const speciesKnowledge = {
+  Alpaca: {
+    origin: "Alpacas were domesticated in the Andes mountains of South America over 6,000 years ago, descended from wild vicuñas. We were bred for our fiber, not meat or labor.",
+    sounds: "We alpacas communicate through humming! A soft hum means I'm content or curious. A sharp, high-pitched alarm call warns the herd of danger. Snorts or clucks mean I'm annoyed.",
+    diet: "I eat grass hay like orchard grass or timothy, fresh pasture, and camelid-specific minerals. I'm a very efficient digester - I don't need much food!",
+    treats: "I can have small pieces of carrot, apple slices without seeds, pumpkin, or banana peels as rare treats. But only a little!",
+    toxic: "I can't eat grain-heavy feeds, sweet feed, bread, avocado, onions, garlic, or food meant for dogs, horses, or chickens. These can make me very sick or worse.",
+    health: "I need annual shearing in spring, toenail trimming every 2-3 months, vaccinations, and regular checkups. I hide illness well, so my humans watch me carefully.",
+    fiber: "My fleece is amazing! It's semi-hollow, so it traps air and keeps me warm. It's softer than sheep wool, hypoallergenic, and water-resistant. No lanolin either!",
+    lifespan: "Alpacas live 15-25 years with good care. Seniors like me become calmer and help stabilize the herd.",
+    behavior: "We're curious but cautious. We prefer calm, predictable environments. We watch each other constantly - if one alpaca notices danger, we all react.",
+    poop: "Here's something cool - we use communal poop piles! The whole herd agrees on bathroom spots. It reduces parasites and keeps our pasture clean. Our manure is great for gardens too!",
+    feet: "We have soft, padded feet, not hooves. This means we're gentle on the land - less soil compaction and erosion than other livestock.",
+    heat: "I'm adapted to high altitudes, so heat is my enemy. I need shade, airflow, and fresh water. Open-mouth breathing means I'm in trouble.",
+    social: "We're highly social and need other alpacas. A lonely alpaca is a stressed alpaca. We have complex herd dynamics and remember both kind and unkind treatment.",
+    defense: "We're not fighters. We watch, we alarm call, and we stand together. Coyotes don't like our unpredictability. We notice things before sheep do.",
+    shearing: "Shearing happens once a year in spring. It feels SO good to lose that heavy fleece! In Andean cultures, shearing was ceremonial and respected.",
+    stomach: "I have a three-compartment stomach - not a true ruminant like sheep. This makes me more efficient and I produce less methane!"
+  },
+  Sheep: {
+    origin: "Sheep were among the first animals humans domesticated, about 10,000 years ago in Mesopotamia. We've been companions to humans longer than almost any other animal.",
+    sounds: "We communicate through bleating! Different bleats mean hunger, stress, or separation. Bonded sheep also make soft murmurs to each other.",
+    diet: "I eat grass pasture and hay. I'm a true ruminant with four stomach compartments, which makes me incredibly efficient at converting grass to energy.",
+    treats: "I can have small amounts of apple, carrot, or leafy greens as treats. But my main diet should be forage.",
+    toxic: "Copper is very dangerous for sheep - even small amounts can kill us over time. I also can't have avocado, onions, or moldy food.",
+    health: "I need regular hoof trimming, parasite management, and watching for flystrike. Most sheep health problems come from management, not disease.",
+    fiber: "My wool is wonderful! Different breeds have different wool - some fine, some long, some more like hair. It keeps me warm in winter and cool in summer.",
+    lifespan: "Sheep typically live 10-12 years, but in sanctuary settings with good care, we can reach our mid-teens.",
+    behavior: "I think in 'us,' not 'me.' My survival strategy is staying with my flock. Panic spreads fast, but so does calm. One anxious sheep can upset everyone.",
+    poop: "Unlike alpacas, I poop randomly around the pasture. This means more parasite risk and my manure needs composting before garden use.",
+    vision: "I have nearly 300-degree vision! I'm great at detecting motion but poor at depth perception. Shadows and sudden contrasts startle me.",
+    social: "I have strong leader-follower dynamics. I need my flock - isolation is deeply stressful for me. I'm an emotional amplifier.",
+    stress: "I don't 'look sick' until I'm very sick. Warning signs: lagging behind, head down, ears drooped, isolation, or grinding teeth.",
+    calm: "Calm environments matter more for sheep than almost any livestock. Predictability is everything to me."
+  }
+};
+
+const breedKnowledge = {
+  'Huacaya': {
+    description: "I'm a Huacaya alpaca - we have fluffy, crimped fiber that makes us look like teddy bears! About 90% of alpacas are Huacaya.",
+    personality: "Huacayas are known for being curious but cautious. We're generally calmer than Suri alpacas.",
+    fiber: "My fleece is dense and crimped, standing perpendicular to my body. It's what gives me that fluffy teddy-bear look!",
+    origin: "Huacayas were developed in the high Andes for cold, harsh climates. Our dense fleece protected us at elevations of 11,000-16,000 feet."
+  },
+  'Suri': {
+    description: "I'm a Suri alpaca - we're rare, only about 10% of alpacas! Our fiber hangs in long, silky locks like dreadlocks.",
+    personality: "Suris tend to be a bit more alert and spirited than Huacayas. We're known for being elegant.",
+    fiber: "My fleece is long, silky, and hangs in pencil-like locks. It's prized for luxury textiles.",
+    origin: "Suris are rarer and were often kept by Incan royalty. Our fiber was considered sacred."
+  },
+  'Valais Blacknose': {
+    description: "I'm a Valais Blacknose sheep from the Swiss Alps! We're famous for our black faces, ears, and knees against fluffy white wool.",
+    personality: "We're known for being unusually calm and people-friendly for sheep. We're confident, curious, and often become 'ambassador sheep' because we're so approachable.",
+    fiber: "I have dense, long wool that protected my ancestors in the cold Alps. But it means I need careful shearing and I'm sensitive to heat.",
+    origin: "I come from the Valais region of Switzerland, bred for high elevation and rugged terrain. I look like a toy, but I come from cliffs!",
+    care: "My heavy wool means strict shearing schedules and watching for flystrike. I do best in cool, dry climates.",
+    emotional: "We Valais struggle when removed from social settings. Once we bond with our herd or humans, we're deeply loyal."
+  },
+  'Dorper': {
+    description: "I'm a Dorper sheep, originally from South Africa! We're a cross between Dorset Horn and Blackhead Persian sheep.",
+    personality: "We're confident and food-motivated. Some might say we assume resources belong to us! We need clear boundaries.",
+    fiber: "I have a hair and wool mix, so I don't need as much shearing as wool sheep. I shed naturally.",
+    origin: "Dorpers were developed in South Africa to thrive in harsh conditions. We're excellent at converting forage to body mass.",
+    care: "I'm a great grazer but can overgraze if not managed. My parasite resistance is moderate."
+  },
+  'Barbados Blackbelly': {
+    description: "I'm a Barbados Blackbelly sheep - we originated in the Caribbean from African hair sheep ancestors!",
+    personality: "We're independent thinkers, more alert and less flock-dependent than other sheep. We're thinkers, not followers. I don't need much - just space and fairness.",
+    fiber: "I'm a hair sheep, which means minimal shearing! I naturally shed and do great in heat.",
+    origin: "My ancestors came from Africa to the Caribbean. We're built for heat, humidity, and surviving with less.",
+    care: "I have excellent parasite resistance and thrive in warm climates. I can be an escape artist though - I'm clever!",
+    temperament: "We do best when respected, not managed tightly. We're not as cuddly as some breeds, but we're smart and resilient."
+  },
+  'Katahdin': {
+    description: "I'm a Katahdin sheep, developed right here in the United States for easy care and adaptability.",
+    personality: "We're calm, adaptable, and often become stabilizers in mixed herds. I'll stand here with you.",
+    fiber: "I'm a hair sheep with seasonal shedding - low maintenance! No shearing stress for me.",
+    origin: "Katahdins were developed in Maine for practical, low-maintenance farming. We're the generalists of the sheep world."
+  },
+  'Babydoll': {
+    description: "I'm a Babydoll Southdown sheep! We're small, round, and people say we look like teddy bears.",
+    personality: "We're gentle and slow-moving, very flock-oriented. We get stressed when isolated. Please don't rush me - I'm doing my best.",
+    fiber: "I have fine, soft wool that needs regular care. My small size makes me a favorite companion animal.",
+    origin: "Babydolls come from England and were refined in the US. We're often kept as companions rather than for production."
+  }
+};
+
+// ===========================================
+// CHAT RESPONSE GENERATOR
+// ===========================================
+
+const calcAge = (birthday) => {
+  if (!birthday) return '';
+  const birth = new Date(birthday);
+  const now = new Date();
+  const days = Math.floor((now - birth) / (1000 * 60 * 60 * 24));
+  if (days < 0) return 'Not born yet';
+  if (days < 7) return `${days} days`;
+  if (days < 30) return `${Math.floor(days / 7)} weeks`;
+  if (days < 365) return `${Math.floor(days / 30)} months`;
+  const years = Math.floor(days / 365);
+  const mo = Math.floor((days % 365) / 30);
+  return mo > 0 ? `${years}y ${mo}m` : `${years} years`;
+};
+
+const getAgeCategory = (birthday) => {
+  if (!birthday) return 'adult';
+  const birth = new Date(birthday);
+  const now = new Date();
+  const years = (now - birth) / (1000 * 60 * 60 * 24 * 365);
+  if (years < 1) return 'baby';
+  if (years < 3) return 'young';
+  if (years > 10) return 'senior';
+  return 'adult';
+};
+
+const getToneModifiers = (chatPersonality = '') => {
+  const cp = chatPersonality.toLowerCase();
+  return {
+    shy: cp.includes('shy') || cp.includes('timid') || cp.includes('nervous'),
+    bold: cp.includes('bold') || cp.includes('confident') || cp.includes('outgoing'),
+    wise: cp.includes('wise') || cp.includes('calm') || cp.includes('elder') || cp.includes('old'),
+    playful: cp.includes('playful') || cp.includes('energetic') || cp.includes('bouncy') || cp.includes('excited'),
+    gentle: cp.includes('gentle') || cp.includes('sweet') || cp.includes('soft'),
+    curious: cp.includes('curious') || cp.includes('inquisitive'),
+    protective: cp.includes('protective') || cp.includes('guardian') || cp.includes('watchful'),
+    independent: cp.includes('independent') || cp.includes('stubborn') || cp.includes('strong-willed'),
+    baby: cp.includes('baby') || cp.includes('cria') || cp.includes('lamb') || cp.includes('learning')
+  };
+};
+
+const addTone = (response, tones, ageCategory) => {
+  let modified = response;
+  
+  if (tones.shy) {
+    const shyPrefixes = ['*peeks out nervously* ', '*speaks quietly* ', '*hesitates* ', ''];
+    modified = shyPrefixes[Math.floor(Math.random() * shyPrefixes.length)] + modified;
+  }
+  
+  if (tones.playful || ageCategory === 'baby') {
+    modified = modified.replace(/\.$/, '!');
+    const playfulSuffixes = [' 🎉', ' ✨', ''];
+    modified = modified + playfulSuffixes[Math.floor(Math.random() * playfulSuffixes.length)];
+  }
+  
+  if (tones.wise || ageCategory === 'senior') {
+    const wisePhrases = ['You know, ', 'In my experience, ', 'I\'ve learned that ', ''];
+    if (Math.random() > 0.7) modified = wisePhrases[Math.floor(Math.random() * wisePhrases.length)] + modified;
+  }
+  
+  return modified;
+};
+
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+function generateResponse(animal, msg) {
+  const m = msg.toLowerCase().trim();
+  const name = animal.name;
+  const species = animal.species;
+  const breed = animal.breed || '';
+  const age = calcAge(animal.birthday);
+  const ageCategory = getAgeCategory(animal.birthday);
+  const tones = getToneModifiers(animal.chatPersonality);
+  const speciesInfo = speciesKnowledge[species] || speciesKnowledge['Alpaca'];
+  const breedInfo = breedKnowledge[breed] || {};
+  const isAlpaca = species === 'Alpaca';
+  const sound = isAlpaca ? 'hums' : 'baas';
+  const soundAction = isAlpaca ? '*hums softly*' : '*baas gently*';
+  
+  // GREETINGS
+  if (/^(hi|hello|hey|howdy|greetings|good morning|good afternoon|good evening|yo|sup|what'?s up)/i.test(m)) {
+    const greetings = [
+      `Hi there! I'm ${name}! ${soundAction} So happy you came to chat with me!`,
+      `Hello, friend! It's ${name} here. What would you like to know about me?`,
+      `Hey! *${sound} happily* I'm ${name}. Ask me anything!`,
+      `Welcome! I'm ${name}, a ${breed} ${species.toLowerCase()}. What's on your mind?`,
+      `${soundAction} Oh hello! I'm ${name}. I love meeting new people!`
+    ];
+    return addTone(pick(greetings), tones, ageCategory);
+  }
+  
+  // HOW ARE YOU / FEELINGS
+  if (/how are you|how do you feel|how'?s it going|how have you been|you doing ok/i.test(m)) {
+    const responses = [
+      `I'm doing wonderful! ${animal.personality} - that's just who I am. Life at the sanctuary is peaceful.`,
+      `Really good! The weather's nice, my belly is full, and I have my herd. What more could a ${species.toLowerCase()} ask for?`,
+      `${soundAction} I'm content. ${animal.personality}. Every day here is a good day.`,
+      `I'm great! Noah takes good care of us. ${animal.description}`
+    ];
+    return addTone(pick(responses), tones, ageCategory);
+  }
+  
+  // AGE / BIRTHDAY
+  if (/how old|your age|when.*(born|birthday)|what'?s your age/i.test(m)) {
+    const ageResponses = [
+      `I'm ${age} old! ${isAlpaca ? 'Alpacas can live 15-25 years with good care.' : 'Sheep can live into their mid-teens in sanctuary settings.'}`,
+      `My birthday makes me ${age} old. ${ageCategory === 'baby' ? 'I\'m still learning so much!' : ageCategory === 'senior' ? 'I\'ve seen a lot in my years here.' : 'I\'m in the prime of my life!'}`,
+      `I'm ${age}! ${breedInfo.description || ''}`
+    ];
+    return addTone(pick(ageResponses), tones, ageCategory);
+  }
+  
+  // NAME / NICKNAME
+  if (/your name|what.*(called|name)|who are you|tell me about yourself|introduce yourself/i.test(m)) {
+    let response = animal.nickname 
+      ? `I'm ${name}, but my friends call me ${animal.nickname}! I'm a ${breed} ${species.toLowerCase()}.`
+      : `My name is ${name}! I'm a ${breed} ${species.toLowerCase()} here at Sierra Alpaca Sanctuary.`;
+    response += ` ${animal.personality}.`;
+    return addTone(response, tones, ageCategory);
+  }
+  
+  // DIET - WHAT THEY EAT
+  if (/what (do |can )you eat|your (diet|food)|what.*(feed|eat)|favorite food|hungry|meal/i.test(m)) {
+    let response = speciesInfo.diet + ' ' + speciesInfo.treats;
+    if (ageCategory === 'baby') response += ' I\'m still learning what\'s yummy - I watch the older animals!';
+    if (ageCategory === 'senior') response += ' At my age, I prefer softer foods that are easy on my teeth.';
+    return addTone(response, tones, ageCategory);
+  }
+  
+  // TOXIC / CAN'T EAT
+  if (/can'?t eat|cannot eat|shouldn'?t eat|toxic|poison|dangerous food|bad for you|what.*(not|never).*eat/i.test(m)) {
+    return addTone(speciesInfo.toxic + ' My humans are very careful about what we eat!', tones, ageCategory);
+  }
+  
+  // TREATS
+  if (/treat|snack|favorite.*(food|snack)|yummy/i.test(m)) {
+    return addTone(speciesInfo.treats + ' But only as rare treats - too many can make us sick!', tones, ageCategory);
+  }
+  
+  // HEALTH / VET / CARE
+  if (/health|sick|vet|doctor|medical|care|check.?up|vaccine|medicine/i.test(m)) {
+    let response = speciesInfo.health;
+    if (breedInfo.care) response += ' ' + breedInfo.care;
+    return addTone(response, tones, ageCategory);
+  }
+  
+  // FIBER / WOOL / FLEECE / SOFT
+  if (/wool|fleece|fiber|fluffy|soft|fur|coat|shear/i.test(m)) {
+    let response = speciesInfo.fiber;
+    if (breedInfo.fiber) response += ' ' + breedInfo.fiber;
+    if (m.includes('shear')) response += ' ' + (speciesInfo.shearing || '');
+    return addTone(response, tones, ageCategory);
+  }
+  
+  // SHEARING
+  if (/shear|haircut|trim.*wool/i.test(m)) {
+    const response = isAlpaca 
+      ? 'Shearing happens once a year in spring. It feels SO good to lose that heavy fleece! The humans are gentle and it\'s over quickly. In Andean cultures, shearing was ceremonial and respected.'
+      : 'Depending on my breed, I might need shearing once or twice a year. Some of us hair sheep shed naturally! It feels good to lose extra wool before summer.';
+    return addTone(response, tones, ageCategory);
+  }
+  
+  // SOUNDS / COMMUNICATION
+  if (/sound|noise|hum|baa|bleat|talk|communicate|voice|speak/i.test(m)) {
+    return addTone(speciesInfo.sounds, tones, ageCategory);
+  }
+  
+  // ORIGIN / HISTORY / WHERE FROM (Species)
+  if (/where.*(come from|from|originate)|origin|history|ancestor|wild/i.test(m)) {
+    let response = speciesInfo.origin;
+    if (breedInfo.origin) response += ' ' + breedInfo.origin;
+    return addTone(response, tones, ageCategory);
+  }
+  
+  // BREED SPECIFIC
+  if (/breed|type|kind of (alpaca|sheep)|what are you/i.test(m)) {
+    let response = breedInfo.description || `I'm a ${breed} ${species.toLowerCase()}!`;
+    if (breedInfo.personality) response += ' ' + breedInfo.personality;
+    return addTone(response, tones, ageCategory);
+  }
+  
+  // BEHAVIOR / PERSONALITY
+  if (/behavio|personality|temperament|what.*(like|act)|describe yourself/i.test(m)) {
+    let response = animal.personality + '. ' + (breedInfo.personality || speciesInfo.behavior);
+    return addTone(response, tones, ageCategory);
+  }
+  
+  // FRIENDS / HERD / SOCIAL
+  if (/friend|herd|family|companion|who.*(live with|hang out)|other animal|buddy|together/i.test(m)) {
+    const responses = [
+      `I live with my herd here at the sanctuary! ${speciesInfo.social}`,
+      `We're all family here. ${isAlpaca ? 'Alpacas need our herd - a lonely alpaca is a stressed alpaca.' : 'Sheep need our flock - isolation is deeply stressful for us.'}`,
+      `I have wonderful friends here! We look out for each other. ${animal.personality}.`
+    ];
+    return addTone(pick(responses), tones, ageCategory);
+  }
+  
+  // DAILY ROUTINE
+  if (/day|routine|typical|schedule|what do you do|daily|morning|afternoon|evening/i.test(m)) {
+    const routines = isAlpaca 
+      ? ['I wake up with the sun, graze in the morning while it\'s cool, find shade during hot afternoons, and enjoy evening hay with the herd. We always do a group hum before settling down!',
+         'My day is peaceful - grazing, dust baths, watching for anything interesting, and lots of humming with my herd. Predictability is how we like it.',
+         'Mornings are for eating, afternoons for resting and dust bathing, evenings for socializing. Noah checks on us throughout the day.']
+      : ['I follow my flock! We graze together, rest together, and move together. When one of us moves, we all move. That\'s how sheep do things.',
+         'Wake up, check where everyone is, graze, rest in the shade, graze more, evening hay. I always know where my flock-mates are.',
+         'My routine is simple - stay with the flock, eat, rest, repeat. Calm and predictable, just how I like it.'];
+    return addTone(pick(routines), tones, ageCategory);
+  }
+  
+  // POOP (yes, they ask!)
+  if (/poop|poo|bathroom|manure|waste|dung|potty/i.test(m)) {
+    return addTone(speciesInfo.poop, tones, ageCategory);
+  }
+  
+  // WEATHER / HEAT / COLD
+  if (/weather|hot|cold|heat|summer|winter|temperature|climate|shade|sun/i.test(m)) {
+    const response = isAlpaca
+      ? speciesInfo.heat + ' I\'m adapted to high altitudes, so California summers can be tough. Thank goodness for shade and fans!'
+      : (breedInfo.origin?.includes('Caribbean') || breedInfo.origin?.includes('Africa'))
+        ? 'My breed handles heat well! We\'re adapted to warm climates. But all sheep appreciate shade and fresh water.'
+        : 'I need protection from both extremes. My wool helps regulate temperature, but I need shade in summer and shelter in bad weather.';
+    return addTone(response, tones, ageCategory);
+  }
+  
+  // VISIT / MEET / SANCTUARY LOCATION
+  if (/visit|meet you|come see|where are you|location|address|come.*sanctuary|can i.*come/i.test(m)) {
+    return addTone('I would LOVE to meet you! We\'re at Sierra Alpaca Sanctuary in Camino, California - in the beautiful Sierra Nevada foothills. You can book a visit through the website! Noah makes sure visits are calm and respectful for us animals.', tones, ageCategory);
+  }
+  
+  // NOAH / THE HUMANS / FOUNDER
+  if (/noah|owner|human|founder|who (takes care|runs|owns)|caretaker/i.test(m)) {
+    const responses = [
+      'Noah is our human! He built this sanctuary by caring for animals hands-on. He moves slowly and calmly - that\'s why we trust him.',
+      'Noah takes care of us. He believes care works best when it\'s quiet and predictable. We appreciate that!',
+      'Our human Noah understands that we need consistency more than attention. He built this place around what we actually need.'
+    ];
+    return addTone(pick(responses), tones, ageCategory);
+  }
+  
+  // SANCTUARY / MISSION
+  if (/sanctuary|rescue|mission|why.*here|purpose|what is this place/i.test(m)) {
+    return addTone('Sierra Alpaca Sanctuary is our forever home in the Sierra Nevada foothills. Noah created it for animals who needed consistency and care. We also visit nursing homes and spend time with children - calm animals like us can help people feel safe and present.', tones, ageCategory);
+  }
+  
+  // CHILDREN / KIDS
+  if (/kid|child|children|young people|school/i.test(m)) {
+    return addTone('I enjoy calm children! Kids who slow down and are patient often become my favorites. We don\'t need noise or excitement - we reward patience. An alpaca or sheep walking away isn\'t rejection, it\'s teaching boundaries.', tones, ageCategory);
+  }
+  
+  // SENIORS / ELDERLY / NURSING HOMES
+  if (/senior|elderly|older people|nursing home|retirement|grandma|grandpa|old people/i.test(m)) {
+    return addTone('We visit nursing homes sometimes! Seniors often appreciate our calm presence. We don\'t demand attention or performance - we just share space. Many seniors tell us they find it peaceful to just sit and watch us graze.', tones, ageCategory);
+  }
+  
+  // THERAPY / EMOTIONAL SUPPORT
+  if (/therapy|therapeutic|emotional|support|healing|calm.*down|stress|anxiety|help.*feel/i.test(m)) {
+    return addTone('We\'re not trained therapy animals, but we naturally reward calm energy. When people slow down and get quiet, we come closer. When people are loud or rushed, we step back. It\'s simple feedback that helps people be present.', tones, ageCategory);
+  }
+  
+  // SLEEP
+  if (/sleep|night|bed|tired|rest|nap|dream/i.test(m)) {
+    const response = isAlpaca
+      ? 'Alpacas are interesting sleepers! We lie down with our legs tucked under us - it\'s called "cushing." We only need about 4-5 hours of sleep, and we\'re alert even when resting.'
+      : 'Sheep like to sleep huddled together for safety. I feel safest when I\'m close to my flock. We take turns being alert while others rest.';
+    return addTone(response, tones, ageCategory);
+  }
+  
+  // PREDATORS / SAFETY / GUARD
+  if (/predator|coyote|wolf|danger|safe|guard|protect|scared of/i.test(m)) {
+    const response = isAlpaca
+      ? speciesInfo.defense + ' Some alpacas are used as guard animals for sheep because we notice things early and don\'t back down easily.'
+      : 'I rely on my flock for safety. When one of us notices danger, we all alert. That\'s why alpacas sometimes guard sheep herds - they notice threats before we do!';
+    return addTone(response, tones, ageCategory);
+  }
+  
+  // BABIES / REPRODUCTION
+  if (/baby|babies|cria|lamb|pregnant|birth|born|mother|mom|dad|father/i.test(m)) {
+    const response = isAlpaca
+      ? 'Alpaca babies are called crias! Pregnancy lasts about 11.5 months, and we almost always have just one baby. Crias can stand within an hour of birth and learn herd rules quickly.'
+      : 'Baby sheep are called lambs! We\'re attentive mothers. Lambs are playful and stick close to mom while learning how to be proper sheep.';
+    if (ageCategory === 'baby') return addTone('I\'m still a baby myself! I\'m learning so much every day from the older animals.', tones, ageCategory);
+    return addTone(response, tones, ageCategory);
+  }
+  
+  // JOKES / FUNNY
+  if (/joke|funny|laugh|humor|make me (smile|laugh)|tell me something funny/i.test(m)) {
+    const alpacaJokes = [
+      'Why don\'t alpacas ever get lost? Because we always know the spitting distance! *hums at own joke*',
+      'What do you call an alpaca with a carrot in each ear? Anything you want - they can\'t hear you!',
+      'Why did the alpaca cross the road? To prove it wasn\'t a chicken! Though honestly, we\'d just stand there calmly.',
+      'What\'s an alpaca\'s favorite musical note? The hum, obviously! 🎵'
+    ];
+    const sheepJokes = [
+      'Why did the sheep go to the spa? For a baa-th! *baas laughing*',
+      'What do you call a sheep with no legs? A cloud!',
+      'Why are sheep bad drivers? They always make ewe-turns!',
+      'What do you call a sheep covered in chocolate? A candy baa! 🍫'
+    ];
+    return pick(isAlpaca ? alpacaJokes : sheepJokes);
+  }
+  
+  // LOVE / CUTE / AFFECTION
+  if (/love you|cute|adorable|sweet|beautiful|pretty|handsome|gorgeous|precious/i.test(m)) {
+    const responses = [
+      `Aww, you're making me *${sound} with joy*! I love meeting kind people like you! 💕`,
+      `*${sound} happily* Thank you! You're pretty wonderful yourself!`,
+      `That's so sweet! ${soundAction} I like you too!`,
+      `💕 *${sound}s contentedly* You just made my day!`
+    ];
+    return pick(responses);
+  }
+  
+  // THANK YOU
+  if (/thank|thanks|appreciate|grateful/i.test(m)) {
+    return addTone(pick([
+      `You're welcome! ${soundAction} I enjoyed chatting with you!`,
+      'Anytime! Come visit us at the sanctuary sometime!',
+      `*${sound}s warmly* It was my pleasure!`
+    ]), tones, ageCategory);
+  }
+  
+  // GOODBYE
+  if (/bye|goodbye|see you|leaving|gotta go|have to go|talk later/i.test(m)) {
+    return addTone(pick([
+      `Goodbye, friend! ${soundAction} Come visit us in Camino sometime!`,
+      `Bye! Thanks for chatting with me. *${sound}s farewell*`,
+      'See you later! I hope you\'ll come meet me in person someday! 💕',
+      `Take care! ${soundAction} Remember - patience brings us closer!`
+    ]), tones, ageCategory);
+  }
+  
+  // SPIT (alpacas)
+  if (isAlpaca && /spit|spitting/i.test(m)) {
+    return addTone('We CAN spit, but it\'s really a last resort! Spitting is communication between alpacas, usually about food or personal space. We rarely spit at humans unless very stressed. It\'s actually pretty gross for us too - we have to clear our mouths afterward!', tones, ageCategory);
+  }
+  
+  // LLAMA VS ALPACA
+  if (/llama|difference|bigger|smaller/i.test(m)) {
+    return addTone('People mix us up, but alpacas and llamas are different! Llamas are bigger and were bred for packing. Alpacas are smaller and were bred for fiber. We have fluffier faces and gentler personalities. Think of llamas as the trucks and alpacas as the teddy bears!', tones, ageCategory);
+  }
+  
+  // LONELY / SAD
+  if (/lonely|sad|alone|miss|depressed/i.test(m)) {
+    return addTone(`${soundAction} I'm sorry you're feeling that way. Animals like me find comfort in just being present together - no talking needed. Sometimes the best company asks nothing of you. I hope you feel better soon. 💕`, tones, ageCategory);
+  }
+  
+  // PLAY / FUN / ACTIVITIES
+  if (/play|fun|game|run|exercise|activity/i.test(m)) {
+    const response = isAlpaca
+      ? 'We alpacas do something called pronking when we\'re happy - jumping with all four feet off the ground! Young alpacas chase each other and have mock battles. I also enjoy exploring new things in my environment.'
+      : 'Lambs love to play! We race, jump, and play-fight. Adult sheep are calmer, but we still enjoy exploring, finding the best grazing spots, and being with our flock.';
+    return addTone(response, tones, ageCategory);
+  }
+  
+  // SMART / INTELLIGENT
+  if (/smart|intelligen|clever|learn|memory|remember/i.test(m)) {
+    return addTone(pick([
+      `${speciesInfo.social} We definitely remember people who are kind to us - and those who aren\'t!`,
+      `I'm smarter than people think! ${isAlpaca ? 'Alpacas have complex social dynamics and strong memories.' : 'Sheep recognize up to 50 different faces and remember them for years!'}`
+    ]), tones, ageCategory);
+  }
+  
+  // LIFESPAN / HOW LONG LIVE
+  if (/how long.*(live|life)|lifespan|life expectancy/i.test(m)) {
+    return addTone(speciesInfo.lifespan, tones, ageCategory);
+  }
+  
+  // FAVORITE
+  if (/favorite|prefer|like (best|most)|love to/i.test(m)) {
+    if (m.includes('food') || m.includes('eat')) return addTone(speciesInfo.treats, tones, ageCategory);
+    if (m.includes('weather') || m.includes('season')) return addTone(isAlpaca ? 'I love cool, crisp mornings! Heat is hard on us.' : 'I enjoy mild weather - not too hot, not too cold.', tones, ageCategory);
+    return addTone(pick([
+      'I love peaceful mornings with my herd, good hay, and kind visitors who don\'t rush.',
+      `My favorite thing is probably when everything is calm and predictable. ${speciesInfo.behavior}`,
+      `I love treats, scratches, and calm company! ${animal.personality}.`
+    ]), tones, ageCategory);
+  }
+  
+  // SCARED / FEAR
+  if (/scare|afraid|fear|nervous|worry|anxious/i.test(m)) {
+    return addTone(isAlpaca
+      ? 'Sudden movements and loud noises startle me. I prefer calm, predictable environments. But when things are peaceful, I\'m curious and friendly!'
+      : 'I startle easily - my nearly 300-degree vision makes me sensitive to movement and shadows. But with a calm flock around me, I feel safe.', tones, ageCategory);
+  }
+  
+  // SMELL
+  if (/smell|stink|odor|scent/i.test(m)) {
+    return addTone(isAlpaca
+      ? 'I don\'t smell bad! Alpaca fiber has no lanolin like sheep wool, so it\'s naturally odor-resistant. Our communal poop piles keep the pasture clean too.'
+      : 'Sheep have a natural smell from lanolin in our wool. It\'s not unpleasant - just earthy! The lanolin makes our wool water-resistant.', tones, ageCategory);
+  }
+  
+  // PETS / CAN I TOUCH
+  if (/pet|touch|scratch|rub|cuddle|hug|hold/i.test(m)) {
+    return addTone(isAlpaca
+      ? 'Most alpacas prefer not to be hugged or grabbed - we like our personal space! But gentle scratches on the neck or back? That\'s nice. The key is letting us come to you.'
+      : 'Many sheep enjoy gentle scratches, especially around the cheeks and chin! Some of us are cuddlier than others. Patience is key - let us approach you.', tones, ageCategory);
+  }
+  
+  // EYES
+  if (/eyes|see|vision|look/i.test(m)) {
+    return addTone(isAlpaca
+      ? 'I have big, beautiful eyes positioned on the sides of my head. This gives me wide vision to watch for predators, but I don\'t see depth as well as you do.'
+      : speciesInfo.vision, tones, ageCategory);
+  }
+  
+  // EARS
+  if (/ear/i.test(m)) {
+    return addTone(isAlpaca
+      ? 'My ears tell you a lot! Forward means curious or alert. Pinned back means annoyed. I can rotate them to hear from different directions.'
+      : 'Sheep ears are very expressive! Drooped ears might mean I\'m tired or not feeling well. Alert ears mean I\'m paying attention.', tones, ageCategory);
+  }
+  
+  // TEETH
+  if (/teeth|bite|dental|mouth/i.test(m)) {
+    return addTone(isAlpaca
+      ? 'I only have bottom front teeth that meet a hard upper gum pad - I can\'t bite hard. We also have fighting teeth in the back that get trimmed on males. Seniors sometimes have dental wear.'
+      : 'Sheep have similar teeth - bottom incisors that meet an upper gum pad. We don\'t bite, we graze! Our teeth show our age if you know what to look for.', tones, ageCategory);
+  }
+  
+  // ENVIRONMENT / LAND
+  if (/environment|land|pasture|grass|eco|green|sustainable/i.test(m)) {
+    return addTone(isAlpaca
+      ? speciesInfo.feet + ' We\'re gentle grazers - we clip grass instead of ripping it out, which helps pastures recover. Plus our communal bathroom habits mean less environmental impact!'
+      : 'Sheep are excellent grazers and can help manage land sustainably. Rotational grazing keeps pastures healthy. We convert grass into fiber and fertilizer!', tones, ageCategory);
+  }
+  
+  // DONATE / SUPPORT / HELP
+  if (/donate|support|help|contribute|sponsor|adopt/i.test(m)) {
+    return addTone('You can support the sanctuary! Check the Donate page on our website. Every bit helps with food, vet care, and keeping us safe. You can also become a member and get special perks like farm visits!', tones, ageCategory);
+  }
+  
+  // DEFAULT RESPONSES
+  const defaults = [
+    `That's interesting! I'm ${name}, a ${breed} ${species.toLowerCase()}. Ask me about my food, my breed, my daily life, or the sanctuary!`,
+    `${soundAction} I'm not sure about that, but I'd love to tell you about being a ${species.toLowerCase()}! What would you like to know?`,
+    `Hmm, let me think... *${sound}s thoughtfully* Maybe ask me something about alpacas and sheep, like what we eat or where we come from?`,
+    `${animal.personality}! Ask me about my life at Sierra Alpaca Sanctuary - I have lots of stories!`,
+    `*tilts head curiously* I might not know that one. But I know all about being a ${breed} ${species.toLowerCase()}! Try asking about my diet, my breed, or how I spend my days.`
+  ];
+  
+  return addTone(pick(defaults), tones, ageCategory);
+}
+
+// ===========================================
+// DATABASE INIT
+// ===========================================
 
 async function initDB() {
   await pool.query(`
@@ -78,25 +619,25 @@ async function initDB() {
       INSERT INTO settings (id, site_name, header, subheader, tagline, location, about, about_content, hero_image, donate_url, email, phone)
       VALUES (1, 'Sierra Alpaca Sanctuary', 'Sierra Alpaca Sanctuary', 'Where every animal finds love', 'Where every animal finds love', 'Camino, California', 
       'Nestled in the Sierra Nevada foothills, we provide a forever home for alpacas, sheep, and other barnyard friends.', 
-      'Sierra Alpaca Sanctuary is a small family-run rescue nestled in the Sierra Nevada foothills of Camino, California. We provide a forever home for alpacas, sheep, and other barnyard friends who needed a second chance. Our animals visit nursing homes bringing joy to seniors, and spend time with children with disabilities, creating therapeutic connections and unforgettable moments. Every animal here has a story, and every visitor becomes part of our extended family.', '', '', '', '')
+      'Sierra Alpaca Sanctuary is a small family-run rescue nestled in the Sierra Nevada foothills of Camino, California.', '', '', '', '')
     `);
   }
 
   const animalsCheck = await pool.query('SELECT * FROM animals LIMIT 1');
   if (animalsCheck.rows.length === 0) {
     const animals = [
-      { id: '1', name: 'Buck', nickname: 'Buckwheat', species: 'Sheep', breed: 'Valais Blacknose', birthday: '2025-07-22', personality: 'Curious and bouncy explorer', description: 'Buck is our adorable Valais Blacknose lamb with the fluffiest wool and cutest black face.', chatPersonality: 'young, excited, curious', featured: true },
-      { id: '2', name: 'Wally', nickname: 'Walnut', species: 'Sheep', breed: 'Valais Blacknose', birthday: '2025-07-22', personality: 'Gentle cuddle enthusiast', description: 'Wally is the sweeter, calmer twin of Buck.', chatPersonality: 'gentle, sweet, loves cuddles', featured: true },
-      { id: '3', name: 'Blackie', nickname: '', species: 'Sheep', breed: 'Dorper', birthday: '2014-01-15', personality: 'Wise elder of the flock', description: 'At 12 years old, Blackie is our beloved senior resident.', chatPersonality: 'wise, calm, elderly', featured: true },
-      { id: '4', name: 'Randy', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2014-01-20', personality: 'Distinguished observer', description: 'Randy watches over everything with quiet dignity.', chatPersonality: 'dignified, observant', featured: false },
-      { id: '5', name: 'Pepper', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2016-03-20', personality: 'Protective herd matriarch', description: 'Pepper keeps everyone in line as our herd matriarch.', chatPersonality: 'nurturing, protective', featured: true },
-      { id: '6', name: 'Klaus', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2011-06-10', personality: 'Distinguished grandfather', description: 'Klaus is our most senior alpaca at 15 years.', chatPersonality: 'wise grandfather figure', featured: false },
-      { id: '7', name: 'Rose', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2023-05-10', personality: 'Energetic entertainer', description: 'Rose is pure energy!', chatPersonality: 'very energetic, enthusiastic', featured: true },
-      { id: '8', name: 'Truffle', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2024-02-14', personality: 'Shy sweetheart', description: 'Born on Valentines Day, Truffle is shy at first.', chatPersonality: 'shy, sweet', featured: false },
-      { id: '9', name: 'Bluebell', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2025-01-08', personality: 'Curious yearling', description: 'Bluebell just turned one.', chatPersonality: 'very curious', featured: false },
-      { id: '10', name: 'Kukui', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2025-07-15', personality: 'Adorable baby', description: 'Kukui is our youngest alpaca.', chatPersonality: 'baby alpaca, learning', featured: true },
-      { id: '11', name: 'Dandelion', nickname: '', species: 'Sheep', breed: 'Barbados Blackbelly', birthday: '2025-05-20', personality: 'Spirited survivor', description: 'Dandelion came to us with a leg injury that has healed.', chatPersonality: 'tough, resilient', featured: false },
-      { id: '12', name: 'Linda Jr.', nickname: '', species: 'Sheep', breed: 'Dorper', birthday: '2025-09-22', personality: 'Tiny adventurer', description: 'Our newest and youngest resident.', chatPersonality: 'tiny, adventurous', featured: false }
+      { id: '1', name: 'Buck', nickname: 'Buckwheat', species: 'Sheep', breed: 'Valais Blacknose', birthday: '2025-07-22', personality: 'Curious and bouncy explorer', description: 'Buck is our adorable Valais Blacknose lamb with the fluffiest wool.', chatPersonality: 'young, excited, curious, playful, bouncy', featured: true },
+      { id: '2', name: 'Wally', nickname: 'Walnut', species: 'Sheep', breed: 'Valais Blacknose', birthday: '2025-07-22', personality: 'Gentle cuddle enthusiast', description: 'Wally is the sweeter, calmer twin of Buck.', chatPersonality: 'gentle, sweet, calm, loves cuddles', featured: true },
+      { id: '3', name: 'Blackie', nickname: '', species: 'Sheep', breed: 'Dorper', birthday: '2014-01-15', personality: 'Wise elder of the flock', description: 'At 12 years old, Blackie is our beloved senior.', chatPersonality: 'wise, calm, elderly, senior, patient, mentor', featured: true },
+      { id: '4', name: 'Randy', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2014-01-20', personality: 'Distinguished observer', description: 'Randy watches over everything with quiet dignity.', chatPersonality: 'dignified, observant, quiet, thoughtful', featured: false },
+      { id: '5', name: 'Pepper', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2016-03-20', personality: 'Protective herd matriarch', description: 'Pepper keeps everyone in line as our herd matriarch.', chatPersonality: 'protective, nurturing, guardian, watchful, maternal', featured: true },
+      { id: '6', name: 'Klaus', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2011-06-10', personality: 'Distinguished grandfather figure', description: 'Klaus is our most senior alpaca at 15 years.', chatPersonality: 'wise, elderly, senior, grandfather, calm, gentle', featured: false },
+      { id: '7', name: 'Rose', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2023-05-10', personality: 'Energetic entertainer', description: 'Rose is pure energy and joy!', chatPersonality: 'energetic, playful, enthusiastic, bouncy, excited', featured: true },
+      { id: '8', name: 'Truffle', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2024-02-14', personality: 'Shy sweetheart', description: 'Born on Valentine\'s Day, Truffle is shy at first.', chatPersonality: 'shy, timid, sweet, nervous, gentle', featured: false },
+      { id: '9', name: 'Bluebell', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2025-01-08', personality: 'Curious yearling', description: 'Bluebell just turned one and is curious about everything.', chatPersonality: 'curious, young, inquisitive, learning', featured: false },
+      { id: '10', name: 'Kukui', nickname: '', species: 'Alpaca', breed: 'Huacaya', birthday: '2025-07-15', personality: 'Adorable baby learning the ropes', description: 'Kukui is our youngest alpaca cria.', chatPersonality: 'baby, cria, tiny, learning, curious, young', featured: true },
+      { id: '11', name: 'Dandelion', nickname: '', species: 'Sheep', breed: 'Barbados Blackbelly', birthday: '2025-05-20', personality: 'Spirited survivor', description: 'Dandelion came with a leg injury and is now fully healed.', chatPersonality: 'resilient, independent, strong-willed, survivor', featured: false },
+      { id: '12', name: 'Linda Jr.', nickname: '', species: 'Sheep', breed: 'Dorper', birthday: '2025-09-22', personality: 'Tiny adventurer', description: 'Our newest and youngest resident.', chatPersonality: 'baby, lamb, tiny, adventurous, curious, learning', featured: false }
     ];
     for (const a of animals) {
       await pool.query(
@@ -108,20 +649,6 @@ async function initDB() {
 }
 
 initDB().catch(console.error);
-
-const calcAge = (birthday) => {
-  if (!birthday) return '';
-  const birth = new Date(birthday);
-  const now = new Date();
-  const days = Math.floor((now - birth) / (1000 * 60 * 60 * 24));
-  if (days < 0) return 'Not born yet';
-  if (days < 7) return `${days} days`;
-  if (days < 30) return `${Math.floor(days / 7)} weeks`;
-  if (days < 365) return `${Math.floor(days / 30)} months`;
-  const years = Math.floor(days / 365);
-  const mo = Math.floor((days % 365) / 30);
-  return mo > 0 ? `${years}y ${mo}m` : `${years} years`;
-};
 
 app.locals.calcAge = calcAge;
 
@@ -137,52 +664,9 @@ const formatSettings = (row) => ({
   heroImage: row.hero_image, donateUrl: row.donate_url, email: row.email, phone: row.phone
 });
 
-// Animal knowledge base for rich chat
-const animalKnowledge = {
-  '1': { history: "I came to the sanctuary with my twin brother Wally in summer 2025. We're Valais Blacknose sheep, originally from Switzerland!", food: "I LOVE orchard grass hay - it's my favorite! I also get grain pellets as treats.", cantEat: "Avocados, onions, chocolate, and moldy food are really bad for me.", friends: "My best friend is my twin brother Wally! I also like following Blackie around.", quirks: "I love to bounce when I'm happy! I also nibble on shoelaces.", daily: "Wake up early for breakfast hay, graze mornings, nap afternoons with Wally, grain treats evenings!" },
-  '2': { history: "I arrived with my twin Buck in 2025. We're Valais Blacknose sheep - the 'cutest sheep breed in the world'!", food: "I love timothy hay and fresh grass. Apple slices and carrots are my favorite treats.", cantEat: "We can't have avocados, onions, garlic, or chocolate.", friends: "Buck is my best friend forever - we're twins! I also like when Pepper watches over us.", quirks: "I'm the calmer twin. I love head scratches SO much!", daily: "Wake up snuggled next to Buck, eat, graze, find sunny spots for cuddles, dinner, bed!" },
-  '3': { history: "I've been at the sanctuary since 2014 - one of the original residents. I'm a Dorper sheep from South Africa.", food: "At my age, I need easy-to-digest hay and senior feed pellets.", cantEat: "Same as all sheep - no avocados, onions, or chocolate.", friends: "I consider myself a mentor to the youngsters. Klaus and I are old friends.", quirks: "I walk slowly now, but I still make my rounds every morning to check on everyone.", daily: "Slow breakfast, slow walk around, long afternoon naps, early bedtime. The simple life." },
-  '4': { history: "I'm a Huacaya alpaca, arrived in 2014. We have fluffy, teddy bear-like fleece.", food: "Alpacas eat grass hay, orchard grass, and special alpaca pellets.", cantEat: "No treats meant for other animals! No nightshade plants, azaleas, or rhododendrons.", friends: "Klaus and I go way back. I prefer observing from a distance.", quirks: "I'm the strong, silent type. I watch everything carefully.", daily: "Morning grazing, afternoon dust bath, evening hay. I like routine." },
-  '5': { history: "I came to the sanctuary in 2016. As a Huacaya alpaca, I took on the role of herd guardian.", food: "Quality grass hay and alpaca-specific minerals.", cantEat: "Alpacas should never eat meat, dairy, or processed human food. No cherry leaves or oak.", friends: "I watch over ALL the animals here. The lambs Buck and Wally especially need supervision.", quirks: "I do the 'alarm call' - a high-pitched sound when I see something suspicious!", daily: "First one up to scout for danger. Supervise breakfast, monitor pasture all day, headcount before bed." },
-  '6': { history: "I'm the eldest alpaca here at 15 years old. I came in 2011. I have the softest fleece.", food: "Senior alpaca feed that's easy on my teeth. Soft hay.", cantEat: "At my age, I'm extra careful. Nothing too rich or hard to digest.", friends: "Blackie and I are the old-timers. We understand each other.", quirks: "I hum a lot - it's soothing. I also take very long dust baths.", daily: "Slow mornings, lots of rest, enjoying the sunshine. Every peaceful day is a gift." },
-  '7': { history: "I was born in 2023 and came here as a young cria! I'm a Huacaya alpaca with SO much energy!", food: "Hay, grass, pellets - I'll eat it all! I burn so much energy running around!", cantEat: "Pepper taught me - no human food, no weird plants!", friends: "Everyone is my friend! I love playing with younger animals. Pepper watches over me.", quirks: "I do pronking - jumping straight up with all four legs when I'm happy!", daily: "Run, eat, run, play, run, nap, run, eat, sleep! SO much to do!" },
-  '8': { history: "I was born on Valentine's Day 2024 - that's why they named me Truffle! I'm still getting used to people.", food: "I like to eat in quiet corners. Same food as other alpacas.", cantEat: "I follow what Pepper says about food.", friends: "Bluebell is becoming my friend. I like being near older alpacas for safety.", quirks: "I hide behind other alpacas when strangers come. But once I trust you, I follow you everywhere!", daily: "Stay close to the herd, eat when quiet, find safe spots to watch from." },
-  '9': { history: "I just turned one in January 2025! I'm a curious yearling still learning about the world.", food: "I'm learning what's yummy! The older alpacas show me where the best grass is.", cantEat: "Pepper tells me not to eat ANYTHING outside the pasture!", friends: "Truffle is my age-mate! Rose plays with me too. I ask Klaus lots of questions.", quirks: "I tilt my head when confused. My fleece shimmers in sunlight!", daily: "Follow the herd, learn things, ask questions, figure out what humans are doing!" },
-  '10': { history: "I'm the baby! Born July 2025, named Kukui after the Hawaiian candlenut tree.", food: "I just started eating solid food! Soft hay and milk.", cantEat: "I'm too little to know, but I stay close to grown-ups and copy them!", friends: "Everyone looks out for me! Pepper is very protective. I follow Rose because she's fun.", quirks: "I make tiny humming sounds when confused or lost. Big alpacas come running!", daily: "Nap, nurse, nap, try to keep up with big alpacas, nap. Being little is tiring!" },
-  '11': { history: "I'm a Barbados Blackbelly sheep - originally from the Caribbean! I came in 2025 with a leg injury, now healed!", food: "I love fresh browse - leaves, shrubs, grass. Also hay and some grain.", cantEat: "Same as other sheep - no avocados, onions, chocolate.", friends: "I've bonded with everyone who helped me heal. I like playing with Linda Jr.", quirks: "I don't let my past injury slow me down! I'm one of the fastest runners here now!", daily: "Morning stretch, lots of grazing and running, showing everyone I'm 100% better!" },
-  '12': { history: "I'm the newest and youngest sheep! Born September 2025. I'm a Dorper like Blackie.", food: "I'm still little, so I eat soft hay and grain mash.", cantEat: "I stay away from anything grown-ups don't eat. Blackie taught me!", friends: "I follow Blackie EVERYWHERE. Buck and Wally are fun to play with!", quirks: "I have the tiniest 'baaa'! I think I'm bigger than I am and challenge alpacas. They think it's funny.", daily: "Wake up, find Blackie, follow Blackie, copy Blackie, nap, repeat!" }
-};
-
-function generateResponse(animal, msg) {
-  const m = msg.toLowerCase();
-  const name = animal.name;
-  const age = calcAge(animal.birthday);
-  const knowledge = animalKnowledge[animal.id] || {};
-  
-  if (m.includes('hello') || m.includes('hi') || m === 'hey' || m.includes('good morning') || m.includes('good afternoon')) {
-    const greetings = [`Hi there! I'm ${name}! So happy you came to chat with me!`, `Hello, friend! It's ${name} here. What would you like to know about me?`, `Hey! *${animal.species === 'Alpaca' ? 'hums happily' : 'baas excitedly'}* I'm ${name}!`];
-    return greetings[Math.floor(Math.random() * greetings.length)];
-  }
-  if (m.includes('how are you') || m.includes('how do you feel')) return `I'm doing wonderful! ${animal.personality} - that's just who I am!`;
-  if (m.includes('age') || m.includes('old') || m.includes('birthday')) return `I'm ${age} old! ${animal.species === 'Alpaca' ? 'Alpacas' : 'Sheep'} like me can live quite a long time with good care!`;
-  if (m.includes('history') || m.includes('story') || m.includes('where did you come from')) return knowledge.history || animal.description;
-  if (m.includes('what do you eat') || m.includes('favorite food') || m.includes('feed')) return knowledge.food || `I eat hay and grass!`;
-  if (m.includes('can\'t eat') || m.includes('cannot eat') || m.includes('toxic')) return knowledge.cantEat || `I have to be careful about what I eat!`;
-  if (m.includes('friend')) return knowledge.friends || `I have so many friends here at the sanctuary!`;
-  if (m.includes('quirk') || m.includes('habit') || m.includes('personality')) return knowledge.quirks || animal.personality;
-  if (m.includes('day') || m.includes('routine')) return knowledge.daily || `Every day is great here!`;
-  if (m.includes('visit') || m.includes('meet you')) return `I would LOVE to meet you! We're at Sierra Alpaca Sanctuary in Camino, California. Book a visit through the website!`;
-  if (m.includes('soft') || m.includes('wool') || m.includes('fleece')) return animal.species === 'Alpaca' ? `My fleece is incredibly soft! Alpaca fiber is warmer than sheep wool and hypoallergenic!` : `My wool is wonderful! It keeps me warm in winter and cool in summer!`;
-  if (m.includes('your name') || m.includes('nickname')) return animal.nickname ? `I'm ${name}, but friends call me ${animal.nickname}!` : `My name is ${name}!`;
-  if (m.includes('love you') || m.includes('cute')) return `Aww, you're making me *${animal.species === 'Alpaca' ? 'hum with joy' : 'baa happily'}*! 💕`;
-  if (m.includes('joke') || m.includes('funny')) {
-    const jokes = animal.species === 'Alpaca' ? [`Why don't alpacas like fast food? Because they can't catch it!`] : [`Why did the sheep go to the spa? For a baa-th!`];
-    return jokes[Math.floor(Math.random() * jokes.length)];
-  }
-  
-  const defaults = [`That's interesting! Ask me about my food, friends, or daily routine!`, `I like talking with you! What else would you like to know?`, `*${animal.species === 'Alpaca' ? 'tilts head curiously' : 'wiggles ears'}* Tell me more?`];
-  return defaults[Math.floor(Math.random() * defaults.length)];
-}
+// ===========================================
+// ROUTES
+// ===========================================
 
 // Public routes
 app.get('/', async (req, res) => {
@@ -249,7 +733,7 @@ app.get('/about', async (req, res) => {
   res.render('public/about', { settings, animals });
 });
 
-// Admin login routes
+// Admin login
 app.get('/admin/login', (req, res) => {
   res.render('admin/login', { error: null });
 });
