@@ -3,31 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title + ' — ' : '' %><%= settings.siteName %></title>
+  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %><%= settings.siteName %></title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; }
-    html { scroll-behavior: smooth; }
-    .fade-up { animation: fadeUp 0.8s ease-out forwards; opacity: 0; }
-    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } from { opacity: 0; transform: translateY(20px); } }
-    .hover-lift { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-    .hover-lift:hover { transform: translateY(-8px); box-shadow: 0 30px 60px -12px rgba(0,0,0,0.1); }
+    .hover-lift { transition: transform 0.2s; }
+    .hover-lift:hover { transform: translateY(-4px); }
+    .fade-up { animation: fadeUp 0.6s ease-out; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body class="bg-white text-neutral-900 antialiased">
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-neutral-100">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="flex justify-between items-center h-16">
-        <a href="/" class="text-lg font-medium tracking-tight"><%= settings.siteName %></a>
-        <div class="hidden md:flex items-center gap-8">
-          <a href="/animals" class="text-neutral-500 hover:text-neutral-900 transition text-sm">Animals</a>
-          <a href="/book" class="text-neutral-500 hover:text-neutral-900 transition text-sm">Book a Visit</a>
-          <a href="/about" class="text-neutral-500 hover:text-neutral-900 transition text-sm">About</a>
-          <a href="/donate" class="bg-neutral-900 text-white px-5 py-2 rounded-full text-sm hover:bg-neutral-800 transition">Donate</a>
-        </div>
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-neutral-100">
+    <nav class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="/" class="text-lg font-medium"><%= settings.siteName %></a>
+      
+      <!-- Desktop Nav -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="/animals" class="text-sm text-neutral-600 hover:text-neutral-900 transition">Animals</a>
+        <a href="/book" class="text-sm text-neutral-600 hover:text-neutral-900 transition">Book a Visit</a>
+        <a href="/about" class="text-sm text-neutral-600 hover:text-neutral-900 transition">About</a>
+        <a href="/donate" class="bg-neutral-900 text-white px-5 py-2 rounded-full text-sm hover:bg-neutral-800 transition">Donate</a>
+      </div>
+      
+      <!-- Mobile Menu Button -->
+      <button id="menu-btn" class="md:hidden p-2 -mr-2" onclick="toggleMenu()">
+        <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </nav>
+    
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-neutral-100 bg-white">
+      <div class="px-6 py-4 space-y-4">
+        <a href="/animals" class="block text-neutral-600 hover:text-neutral-900 transition">Animals</a>
+        <a href="/book" class="block text-neutral-600 hover:text-neutral-900 transition">Book a Visit</a>
+        <a href="/about" class="block text-neutral-600 hover:text-neutral-900 transition">About</a>
+        <a href="/donate" class="block bg-neutral-900 text-white px-5 py-3 rounded-full text-sm text-center hover:bg-neutral-800 transition">Donate</a>
       </div>
     </div>
-  </nav>
-  <main class="pt-16">
+  </header>
+  
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('mobile-menu');
+      const menuIcon = document.getElementById('menu-icon');
+      const closeIcon = document.getElementById('close-icon');
+      menu.classList.toggle('hidden');
+      menuIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
+    }
+  </script>
+  
+  <main>
