@@ -1,42 +1,197 @@
-<%- include('../partials/header', { settings, title: 'Animals' }) %>
+<%- include('../partials/header', { settings, title: animal.name }) %>
 
 <section class="py-16">
-  <div class="max-w-6xl mx-auto px-6">
-    <div class="text-center mb-12">
-      <h1 class="text-4xl font-light mb-3">Featured Animals</h1>
-      <p class="text-neutral-500">Click on any animal to learn more or start a conversation</p>
-    </div>
+  <div class="max-w-4xl mx-auto px-6">
+    <a href="/animals" class="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 transition mb-8">
+      ← Back to Animals
+    </a>
     
-    <div class="flex justify-center gap-4 mb-10 flex-wrap">
-      <a href="/animals" class="px-4 py-2 rounded-full text-sm <%= !currentSpecies ? 'bg-neutral-900 text-white' : 'bg-neutral-100 hover:bg-neutral-200' %> transition">All</a>
-      <% speciesList.forEach(s => { %>
-        <a href="/animals?species=<%= s %>" class="px-4 py-2 rounded-full text-sm <%= currentSpecies === s ? 'bg-neutral-900 text-white' : 'bg-neutral-100 hover:bg-neutral-200' %> transition"><%= s %></a>
-      <% }); %>
-    </div>
-    
-    <div class="grid md:grid-cols-3 gap-6">
-      <% animals.forEach(animal => { %>
-        <div class="group hover-lift bg-white rounded-2xl overflow-hidden border border-neutral-100">
-          <div class="aspect-[4/3] bg-neutral-100 overflow-hidden">
-            <% if (animal.photos && animal.photos.length > 0) { %>
-              <img src="<%= animal.photos[0] %>" alt="<%= animal.name %>" class="w-full h-full object-cover">
-            <% } else { %>
-              <div class="w-full h-full flex items-center justify-center text-6xl bg-gradient-to-br from-amber-50 to-emerald-50"><%= animal.species === 'Alpaca' ? '🦙' : '🐑' %></div>
-            <% } %>
-          </div>
-          <div class="p-5">
-            <h3 class="font-medium text-lg mb-1"><%= animal.name %></h3>
-            <p class="text-neutral-400 text-sm mb-3"><%= animal.breed %> · <%= calcAge(animal.birthday) %></p>
-            <p class="text-neutral-500 text-sm mb-4"><%= animal.personality %></p>
-            <div class="flex gap-2">
-              <a href="/animal/<%= animal.id %>" class="flex-1 text-center text-sm py-2 border border-neutral-200 rounded-full hover:border-neutral-400 transition">Profile</a>
-              <a href="/chat/<%= animal.id %>" class="flex-1 text-center text-sm py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition">Chat</a>
+    <div class="grid md:grid-cols-2 gap-10">
+      <!-- Photo Gallery -->
+      <div>
+        <% if (animal.photos && animal.photos.length > 0) { %>
+          <div id="main-photo-container" class="aspect-square rounded-2xl overflow-hidden bg-neutral-100 mb-3 cursor-pointer relative">
+            <img id="main-photo" src="<%= animal.photos[0] %>" alt="<%= animal.name %>" class="w-full h-full object-cover">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition bg-black/20">
+              <span class="bg-white/90 px-4 py-2 rounded-full text-sm">Click to enlarge</span>
             </div>
           </div>
+          
+          <% if (animal.photos.length > 1) { %>
+            <div class="flex gap-2 overflow-x-auto pb-2">
+              <% animal.photos.forEach((photo, index) => { %>
+                <button class="thumb-btn flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-neutral-100 border-2 transition <%= index === 0 ? 'border-emerald-500' : 'border-transparent hover:border-neutral-300' %>" data-index="<%= index %>">
+                  <img src="<%= photo %>" alt="<%= animal.name %>" class="w-full h-full object-cover">
+                </button>
+              <% }); %>
+            </div>
+            <p class="text-xs text-neutral-400 mt-2 text-center">Tap photo to enlarge • Use arrows or swipe to navigate</p>
+          <% } %>
+        <% } else { %>
+          <div class="aspect-square rounded-2xl bg-gradient-to-br from-amber-50 to-emerald-50 flex items-center justify-center text-8xl">
+            <%= animal.species === 'Alpaca' ? '🦙' : '🐑' %>
+          </div>
+        <% } %>
+      </div>
+      
+      <!-- Info -->
+      <div>
+        <h1 class="text-4xl font-light mb-2"><%= animal.name %></h1>
+        <% if (animal.nickname) { %>
+          <p class="text-neutral-400 mb-4">aka "<%= animal.nickname %>"</p>
+        <% } %>
+        
+        <div class="flex flex-wrap gap-2 mb-6">
+          <span class="bg-neutral-100 px-3 py-1 rounded-full text-sm"><%= animal.species %></span>
+          <span class="bg-neutral-100 px-3 py-1 rounded-full text-sm"><%= animal.breed %></span>
+          <span class="bg-neutral-100 px-3 py-1 rounded-full text-sm"><%= calcAge(animal.birthday) %> old</span>
         </div>
-      <% }); %>
+        
+        <p class="text-lg text-emerald-600 mb-4"><%= animal.personality %></p>
+        
+        <p class="text-neutral-600 leading-relaxed mb-8"><%= animal.description %></p>
+        
+        <a href="/chat/<%= animal.id %>" class="inline-block bg-emerald-600 text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-emerald-700 transition">
+          Chat with <%= animal.name %>
+        </a>
+      </div>
     </div>
   </div>
 </section>
+
+<!-- Lightbox -->
+<% if (animal.photos && animal.photos.length > 0) { %>
+<div id="lightbox" class="fixed inset-0 bg-black/95 z-50 hidden flex-col items-center justify-center">
+  <button id="close-btn" class="absolute top-4 right-4 text-white/70 hover:text-white z-10 p-2">
+    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+  </button>
+  
+  <% if (animal.photos.length > 1) { %>
+    <button id="prev-btn" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white z-10 p-2">
+      <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <button id="next-btn" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white z-10 p-2">
+      <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+  <% } %>
+  
+  <div id="lightbox-img-container" class="flex items-center justify-center w-full h-full p-4">
+    <img id="lightbox-img" src="" class="max-h-full max-w-full object-contain">
+  </div>
+  
+  <% if (animal.photos.length > 1) { %>
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 text-sm">
+      <span id="lightbox-counter">1</span> / <%= animal.photos.length %>
+    </div>
+  <% } %>
+</div>
+
+<script>
+(function() {
+  const photos = <%- JSON.stringify(animal.photos) %>;
+  let currentIndex = 0;
+  
+  const mainPhoto = document.getElementById('main-photo');
+  const mainPhotoContainer = document.getElementById('main-photo-container');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxCounter = document.getElementById('lightbox-counter');
+  const thumbBtns = document.querySelectorAll('.thumb-btn');
+  
+  // Thumbnail clicks - change main photo
+  thumbBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const index = parseInt(this.dataset.index);
+      currentIndex = index;
+      mainPhoto.src = photos[index];
+      thumbBtns.forEach(b => {
+        b.classList.remove('border-emerald-500');
+        b.classList.add('border-transparent');
+      });
+      this.classList.remove('border-transparent');
+      this.classList.add('border-emerald-500');
+    });
+  });
+  
+  // Main photo click - open lightbox
+  mainPhotoContainer.addEventListener('click', function() {
+    openLightbox(currentIndex);
+  });
+  
+  function openLightbox(index) {
+    currentIndex = index;
+    lightboxImg.src = photos[currentIndex];
+    if (lightboxCounter) lightboxCounter.textContent = currentIndex + 1;
+    lightbox.classList.remove('hidden');
+    lightbox.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeLightbox() {
+    lightbox.classList.add('hidden');
+    lightbox.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
+  
+  function showPhoto(index) {
+    currentIndex = index;
+    if (currentIndex < 0) currentIndex = photos.length - 1;
+    if (currentIndex >= photos.length) currentIndex = 0;
+    lightboxImg.src = photos[currentIndex];
+    if (lightboxCounter) lightboxCounter.textContent = currentIndex + 1;
+  }
+  
+  // Close button
+  document.getElementById('close-btn').addEventListener('click', closeLightbox);
+  
+  // Nav buttons
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  if (prevBtn) prevBtn.addEventListener('click', () => showPhoto(currentIndex - 1));
+  if (nextBtn) nextBtn.addEventListener('click', () => showPhoto(currentIndex + 1));
+  
+  // Click outside image to close
+  lightbox.addEventListener('click', function(e) {
+    if (e.target === lightbox || e.target.id === 'lightbox-img-container') {
+      closeLightbox();
+    }
+  });
+  
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    if (lightbox.classList.contains('hidden')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') showPhoto(currentIndex - 1);
+    if (e.key === 'ArrowRight') showPhoto(currentIndex + 1);
+  });
+  
+  // Touch swipe
+  let touchStartX = 0;
+  let touchEndX = 0;
+  
+  lightbox.addEventListener('touchstart', function(e) {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+  
+  lightbox.addEventListener('touchend', function(e) {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        showPhoto(currentIndex + 1);
+      } else {
+        showPhoto(currentIndex - 1);
+      }
+    }
+  }, { passive: true });
+})();
+</script>
+<% } %>
 
 <%- include('../partials/footer', { settings }) %>
