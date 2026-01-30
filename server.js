@@ -271,10 +271,24 @@ function generateResponse(animal, msg) {
     return addTone(speciesInfo.toxic + ' My humans are very careful about what we eat!', tones, ageCategory);
   }
   
+  // SPECIFIC FOOD QUESTIONS
+  if (/can (you|i give you).*(eat|have)|is .*(safe|ok|okay)|do you (like|eat)/i.test(m)) {
+    const safeAlpaca = ['carrot', 'apple', 'pumpkin', 'banana', 'lettuce', 'celery'];
+    const safeSheep = ['carrot', 'apple', 'lettuce', 'pumpkin', 'watermelon', 'celery'];
+    const toxic = ['avocado', 'onion', 'garlic', 'chocolate', 'bread', 'grain', 'dog food', 'cat food', 'horse feed', 'chicken feed'];
+    const safe = isAlpaca ? safeAlpaca : safeSheep;
+    
+    for (const food of toxic) {
+      if (m.includes(food)) return addTone(`No! ${food.charAt(0).toUpperCase() + food.slice(1)} is dangerous for ${species.toLowerCase()}s! ${speciesInfo.toxic}`, tones, ageCategory);
+    }
+    for (const food of safe) {
+      if (m.includes(food)) return addTone(`Yes, I can have ${food} as a small treat! But only occasionally - treats should be rare. ${speciesInfo.treats}`, tones, ageCategory);
+    }
+    return addTone(`I'm not sure about that specific food. To be safe, stick to: ${safe.join(', ')}. ${speciesInfo.toxic}`, tones, ageCategory);
+  }
+  
   // TREATS
   if (/treat|snack|favorite.*(food|snack)|yummy/i.test(m)) {
-    return addTone(speciesInfo.treats + ' But only as rare treats - too many can make us sick!', tones, ageCategory);
-  }
   
   // HEALTH / VET / CARE
   if (/health|sick|vet|doctor|medical|care|check.?up|vaccine|medicine/i.test(m)) {
