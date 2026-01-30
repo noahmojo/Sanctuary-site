@@ -1,3 +1,36 @@
-  </main>
+</main>
+  
+  <footer class="bg-neutral-900 text-white py-16">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid md:grid-cols-4 gap-10">
+        <div class="md:col-span-2">
+          <h3 class="text-lg font-medium mb-3"><%= settings.siteName %></h3>
+          <p class="text-neutral-400 text-sm leading-relaxed mb-4"><%= settings.tagline %></p>
+          <p class="text-neutral-500 text-sm"><%= settings.location %></p>
+          <p class="text-emerald-500 text-sm mt-2">501(c)(3) Nonprofit Organization</p>
+        </div>
+        <div>
+          <h4 class="font-medium mb-4 text-sm">Explore</h4>
+          <ul class="space-y-2 text-sm text-neutral-400">
+            <li><a href="/animals" class="hover:text-white transition">Animals</a></li>
+            <li><a href="/book" class="hover:text-white transition">Book a Visit</a></li>
+            <li><a href="/about" class="hover:text-white transition">About Us</a></li>
+            <li><a href="/donate" class="hover:text-white transition">Donate</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-medium mb-4 text-sm">Connect</h4>
+          <ul class="space-y-2 text-sm text-neutral-400">
+            <% if (settings.email) { %><li><a href="mailto:<%= settings.email %>" class="hover:text-white transition"><%= settings.email %></a></li><% } %>
+            <% if (settings.phone) { %><li><a href="tel:<%= settings.phone %>" class="hover:text-white transition"><%= settings.phone %></a></li><% } %>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-neutral-800 mt-12 pt-8 text-center text-neutral-500 text-sm">
+        <p>&copy; <%= new Date().getFullYear() %> <%= settings.siteName %>. All rights reserved.</p>
+        <p class="mt-1">A 501(c)(3) nonprofit · All donations are tax-deductible</p>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
