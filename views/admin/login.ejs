@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>* { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-neutral-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white rounded-2xl shadow-sm p-8 w-full max-w-sm">
+    <div class="text-center mb-8">
+      <p class="text-4xl mb-4">🦙</p>
+      <h1 class="text-xl font-medium">Admin Login</h1>
+      <p class="text-neutral-500 text-sm mt-1">Sierra Alpaca Sanctuary</p>
+    </div>
+    
+    <% if (error) { %>
+      <div class="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg mb-6"><%= error %></div>
+    <% } %>
+    
+    <form method="POST" action="/admin/login">
+      <div class="mb-6">
+        <label class="block text-sm font-medium mb-1.5">Password</label>
+        <input type="password" name="password" required autofocus class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500">
+      </div>
+      <button type="submit" class="w-full bg-emerald-600 text-white py-3 rounded-lg text-sm font-medium hover:bg-emerald-700 transition">Login</button>
+    </form>
+    
+    <p class="text-center mt-6">
+      <a href="/" class="text-sm text-neutral-500 hover:text-neutral-700">← Back to site</a>
+    </p>
+  </div>
+</body>
+</html>
