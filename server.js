@@ -49,7 +49,7 @@ function requireAdmin(req, res, next) {
 async function sendWelcomeEmail(email) {
   try {
     await resend.emails.send({
-      from: 'Sierra Alpaca Sanctuary <onboarding@resend.dev>',
+      from: 'Sierra Alpaca Sanctuary <hello@sierraalpacas.org>',
       to: email,
       subject: 'Welcome to Sierra Alpaca Sanctuary! 🦙',
       html: `
