@@ -76,7 +76,7 @@ async function sendWelcomeEmail(email) {
 async function sendBookingConfirmation(booking) {
   try {
     await resend.emails.send({
-      from: 'Sierra Alpaca Sanctuary <onboarding@resend.dev>',
+      from: 'Sierra Alpaca Sanctuary <hello@sierraalpacas.org>',
       to: booking.email,
       subject: 'We received your visit request! 🦙',
       html: `
