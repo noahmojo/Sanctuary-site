@@ -5,10 +5,12 @@ const { v4: uuidv4 } = require('uuid');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { Pool } = require('pg');
+const { Resend } = require('resend');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'alpaca123';
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -41,6 +43,85 @@ app.use(session({
 function requireAdmin(req, res, next) {
   if (req.session.isAdmin) return next();
   res.redirect('/admin/login');
+}
+
+// Email functions
+async function sendWelcomeEmail(email) {
+  try {
+    await resend.emails.send({
+      from: 'Sierra Alpaca Sanctuary <onboarding@resend.dev>',
+      to: email,
+      subject: 'Welcome to Sierra Alpaca Sanctuary! 🦙',
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #059669;">Welcome to the Herd!</h1>
+          <p>Thank you for joining the Sierra Alpaca Sanctuary community.</p>
+          <p>You'll receive updates about our animals, upcoming events, and ways to support our mission of providing forever homes for alpacas and sheep in the Sierra Nevada foothills.</p>
+          <p>In the meantime, feel free to:</p>
+          <ul>
+            <li><a href="https://www.sierraalpacas.org/animals">Meet our animals</a></li>
+            <li><a href="https://www.sierraalpacas.org/book">Book a visit</a></li>
+            <li><a href="https://www.sierraalpacas.org/donate">Become a member</a></li>
+          </ul>
+          <p>With warm regards,<br>Sierra Alpaca Sanctuary</p>
+          <p style="color: #999; font-size: 12px; margin-top: 40px;">You're receiving this because you signed up at sierraalpacas.org</p>
+        </div>
+      `
+    });
+  } catch (e) {
+    console.error('Welcome email failed:', e);
+  }
+}
+
+async function sendBookingConfirmation(booking) {
+  try {
+    await resend.emails.send({
+      from: 'Sierra Alpaca Sanctuary <onboarding@resend.dev>',
+      to: booking.email,
+      subject: 'We received your visit request! 🦙',
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #059669;">Thank You, ${booking.contact}!</h1>
+          <p>We've received your request for a <strong>${booking.type}</strong> visit.</p>
+          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0;"><strong>Organization:</strong> ${booking.organization}</p>
+            <p style="margin: 10px 0 0;"><strong>Preferred Date:</strong> ${booking.date || 'Flexible'}</p>
+            <p style="margin: 10px 0 0;"><strong>Expected Attendees:</strong> ${booking.attendees || 'TBD'}</p>
+          </div>
+          <p>We'll review your request and get back to you within 24-48 hours to discuss details and availability.</p>
+          <p>With warm regards,<br>Sierra Alpaca Sanctuary</p>
+        </div>
+      `
+    });
+  } catch (e) {
+    console.error('Booking confirmation failed:', e);
+  }
+}
+
+async function sendBookingNotification(booking) {
+  try {
+    await resend.emails.send({
+      from: 'Sierra Alpaca Sanctuary <onboarding@resend.dev>',
+      to: 'noah@sierraalpacas.org',
+      subject: `New ${booking.type} Visit Request`,
+      html: `
+        <div style="font-family: sans-serif;">
+          <h2>New Booking Request</h2>
+          <p><strong>Type:</strong> ${booking.type}</p>
+          <p><strong>Organization:</strong> ${booking.organization}</p>
+          <p><strong>Contact:</strong> ${booking.contact}</p>
+          <p><strong>Email:</strong> ${booking.email}</p>
+          <p><strong>Phone:</strong> ${booking.phone || 'Not provided'}</p>
+          <p><strong>Date:</strong> ${booking.date || 'Flexible'}</p>
+          <p><strong>Attendees:</strong> ${booking.attendees || 'TBD'}</p>
+          <p><strong>Message:</strong> ${booking.message || 'None'}</p>
+          <p><a href="https://www.sierraalpacas.org/admin/bookings">View in Admin</a></p>
+        </div>
+      `
+    });
+  } catch (e) {
+    console.error('Booking notification failed:', e);
+  }
 }
 
 const speciesKnowledge = {
@@ -479,6 +560,12 @@ async function initDB() {
     )
   `);
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS subscribers (
+      id TEXT PRIMARY KEY, email TEXT UNIQUE, source TEXT, created_at TEXT
+    )
+  `);
+
   try {
     await pool.query(`ALTER TABLE settings ADD COLUMN IF NOT EXISTS header TEXT`);
     await pool.query(`ALTER TABLE settings ADD COLUMN IF NOT EXISTS subheader TEXT`);
@@ -536,6 +623,7 @@ const formatSettings = (row) => ({
   heroImage: row.hero_image, donateUrl: row.donate_url, email: row.email, phone: row.phone
 });
 
+// Public routes
 app.get('/', async (req, res) => {
   const animals = (await pool.query('SELECT * FROM animals')).rows.map(formatAnimal);
   const settings = formatSettings((await pool.query('SELECT * FROM settings WHERE id = 1')).rows[0]);
@@ -582,10 +670,37 @@ app.get('/book', async (req, res) => {
 });
 
 app.post('/book', async (req, res) => {
+  const booking = {
+    id: uuidv4(),
+    type: req.body.type,
+    organization: req.body.organization,
+    contact: req.body.contact,
+    email: req.body.email,
+    phone: req.body.phone,
+    date: req.body.date,
+    attendees: req.body.attendees,
+    message: req.body.message,
+    created_at: new Date().toISOString(),
+    status: 'pending'
+  };
+  
   await pool.query(
     'INSERT INTO bookings (id, type, organization, contact, email, phone, date, attendees, message, created_at, status) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',
-    [uuidv4(), req.body.type, req.body.organization, req.body.contact, req.body.email, req.body.phone, req.body.date, req.body.attendees, req.body.message, new Date().toISOString(), 'pending']
+    [booking.id, booking.type, booking.organization, booking.contact, booking.email, booking.phone, booking.date, booking.attendees, booking.message, booking.created_at, booking.status]
   );
+  
+  // Send emails
+  await sendBookingConfirmation(booking);
+  await sendBookingNotification(booking);
+  
+  // Add to subscribers
+  try {
+    await pool.query(
+      'INSERT INTO subscribers (id, email, source, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING',
+      [uuidv4(), booking.email, 'booking', new Date().toISOString()]
+    );
+  } catch (e) {}
+  
   res.redirect('/book?success=1');
 });
 
@@ -600,6 +715,24 @@ app.get('/about', async (req, res) => {
   res.render('public/about', { settings, animals });
 });
 
+// Newsletter signup
+app.post('/subscribe', async (req, res) => {
+  const email = req.body.email;
+  if (!email) return res.status(400).json({ error: 'Email required' });
+  
+  try {
+    await pool.query(
+      'INSERT INTO subscribers (id, email, source, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING',
+      [uuidv4(), email, 'newsletter', new Date().toISOString()]
+    );
+    await sendWelcomeEmail(email);
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to subscribe' });
+  }
+});
+
+// Admin login
 app.get('/admin/login', (req, res) => {
   res.render('admin/login', { error: null });
 });
@@ -618,6 +751,7 @@ app.get('/admin/logout', (req, res) => {
   res.redirect('/');
 });
 
+// Protected admin routes
 app.get('/admin', requireAdmin, async (req, res) => {
   const animals = (await pool.query('SELECT * FROM animals')).rows.map(formatAnimal);
   const settings = formatSettings((await pool.query('SELECT * FROM settings WHERE id = 1')).rows[0]);
@@ -688,6 +822,25 @@ app.post('/admin/settings', requireAdmin, upload.single('heroImage'), async (req
     [req.body.siteName, req.body.header, req.body.subheader, req.body.tagline, req.body.location, req.body.about, req.body.aboutContent, heroImage, req.body.donateUrl, req.body.email, req.body.phone]
   );
   res.redirect('/admin/settings');
+});
+
+// Subscribers admin
+app.get('/admin/subscribers', requireAdmin, async (req, res) => {
+  const subscribers = (await pool.query('SELECT * FROM subscribers ORDER BY created_at DESC')).rows;
+  res.render('admin/subscribers', { subscribers });
+});
+
+app.get('/admin/subscribers/export', requireAdmin, async (req, res) => {
+  const subscribers = (await pool.query('SELECT email, source, created_at FROM subscribers ORDER BY created_at DESC')).rows;
+  const csv = 'email,source,created_at\n' + subscribers.map(s => `${s.email},${s.source},${s.created_at}`).join('\n');
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', 'attachment; filename=subscribers.csv');
+  res.send(csv);
+});
+
+app.post('/admin/subscribers/:id/delete', requireAdmin, async (req, res) => {
+  await pool.query('DELETE FROM subscribers WHERE id = $1', [req.params.id]);
+  res.redirect('/admin/subscribers');
 });
 
 app.listen(PORT, () => console.log(`Sanctuary running on port ${PORT}`));
