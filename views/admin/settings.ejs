@@ -1,78 +1,71 @@
-<%- include('../partials/admin-header') %>
-
-<div class="max-w-2xl mx-auto">
-  <h1 class="text-2xl font-light mb-8">Site Settings</h1>
-  
-  <form method="POST" action="/admin/settings" enctype="multipart/form-data" class="bg-white rounded-xl p-6 space-y-5">
-    <div>
-      <label class="block text-sm font-medium mb-1.5">Site Name</label>
-      <input type="text" name="siteName" value="<%= settings.siteName %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
-    </div>
-    
-    <div>
-      <label class="block text-sm font-medium mb-1.5">Homepage Header</label>
-      <input type="text" name="header" value="<%= settings.header || settings.siteName %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
-    </div>
-    
-    <div>
-      <label class="block text-sm font-medium mb-1.5">Homepage Subheader</label>
-      <input type="text" name="subheader" value="<%= settings.subheader || settings.tagline %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
-    </div>
-    
-    <div>
-      <label class="block text-sm font-medium mb-1.5">Tagline</label>
-      <input type="text" name="tagline" value="<%= settings.tagline %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
-      <p class="text-xs text-neutral-400 mt-1">Used in footer and meta description</p>
-    </div>
-    
-    <div>
-      <label class="block text-sm font-medium mb-1.5">Location</label>
-      <input type="text" name="location" value="<%= settings.location %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
-    </div>
-    
-    <div>
-      <label class="block text-sm font-medium mb-1.5">Hero Image</label>
-      <% if (settings.heroImage) { %>
-        <div class="mb-3">
-          <img src="<%= settings.heroImage %>" class="w-full h-32 object-cover rounded-lg">
-          <input type="hidden" name="existingHeroImage" value="<%= settings.heroImage %>">
-        </div>
-      <% } %>
-      <input type="file" name="heroImage" accept="image/*" class="w-full text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-50 file:text-emerald-700">
-      <p class="text-xs text-neutral-400 mt-1">Recommended: Wide landscape image (1920x1080 or similar)</p>
-    </div>
-    
-    <div>
-      <label class="block text-sm font-medium mb-1.5">Short About (for previews)</label>
-      <textarea name="about" rows="2" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm resize-none"><%= settings.about %></textarea>
-    </div>
-    
-    <div>
-      <label class="block text-sm font-medium mb-1.5">About Page Content</label>
-      <textarea name="aboutContent" rows="8" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm resize-none"><%= settings.aboutContent || settings.about %></textarea>
-      <p class="text-xs text-neutral-400 mt-1">Full content shown on the About Us page. Use blank lines for paragraphs.</p>
-    </div>
-    
-    <div>
-      <label class="block text-sm font-medium mb-1.5">Donation URL</label>
-      <input type="url" name="donateUrl" value="<%= settings.donateUrl %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm" placeholder="https://...">
-    </div>
-    
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium mb-1.5">Email</label>
-        <input type="email" name="email" value="<%= settings.email %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
-      </div>
-      <div>
-        <label class="block text-sm font-medium mb-1.5">Phone</label>
-        <input type="tel" name="phone" value="<%= settings.phone %>" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscribers - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>* { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-neutral-50">
+  <nav class="bg-white border-b border-neutral-200 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <a href="/admin" class="font-medium">🦙 Sanctuary Admin</a>
+      <div class="flex gap-6 text-sm">
+        <a href="/admin/animals" class="text-neutral-600 hover:text-neutral-900">Animals</a>
+        <a href="/admin/bookings" class="text-neutral-600 hover:text-neutral-900">Bookings</a>
+        <a href="/admin/subscribers" class="text-neutral-900 font-medium">Subscribers</a>
+        <a href="/admin/settings" class="text-neutral-600 hover:text-neutral-900">Settings</a>
+        <a href="/admin/logout" class="text-neutral-600 hover:text-neutral-900">Logout</a>
       </div>
     </div>
-    
-    <div class="pt-4 border-t">
-      <button type="submit" class="bg-emerald-600 text-white px-6 py-2.5 rounded-lg text-sm hover:bg-emerald-700 transition">Save Settings</button>
-    </div>
-  </form>
-</div>
+  </nav>
 
-<%- include('../partials/admin-footer') %>
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-2xl font-light">Subscribers</h1>
+        <p class="text-neutral-500 text-sm mt-1"><%= subscribers.length %> total subscribers</p>
+      </div>
+      <a href="/admin/subscribers/export" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition">Export CSV</a>
+    </div>
+
+    <div class="bg-white rounded-xl border border-neutral-200 overflow-hidden">
+      <table class="w-full">
+        <thead class="bg-neutral-50 border-b border-neutral-200">
+          <tr>
+            <th class="text-left px-6 py-3 text-sm font-medium text-neutral-600">Email</th>
+            <th class="text-left px-6 py-3 text-sm font-medium text-neutral-600">Source</th>
+            <th class="text-left px-6 py-3 text-sm font-medium text-neutral-600">Date</th>
+            <th class="text-right px-6 py-3 text-sm font-medium text-neutral-600">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-neutral-100">
+          <% if (subscribers.length === 0) { %>
+            <tr>
+              <td colspan="4" class="px-6 py-12 text-center text-neutral-400">No subscribers yet</td>
+            </tr>
+          <% } %>
+          <% subscribers.forEach(sub => { %>
+            <tr class="hover:bg-neutral-50">
+              <td class="px-6 py-4 text-sm"><%= sub.email %></td>
+              <td class="px-6 py-4 text-sm">
+                <span class="inline-block px-2 py-1 rounded-full text-xs <%= sub.source === 'booking' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600' %>">
+                  <%= sub.source %>
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm text-neutral-500"><%= new Date(sub.created_at).toLocaleDateString() %></td>
+              <td class="px-6 py-4 text-right">
+                <form method="POST" action="/admin/subscribers/<%= sub.id %>/delete" class="inline" onsubmit="return confirm('Remove this subscriber?')">
+                  <button type="submit" class="text-red-500 hover:text-red-700 text-sm">Remove</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>
