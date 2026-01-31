@@ -1,30 +1,44 @@
 <%- include('../partials/header', { settings, title: 'About Us' }) %>
 
 <section class="py-16">
-  <div class="max-w-4xl mx-auto px-6">
+  <div class="max-w-5xl mx-auto px-6">
     <h1 class="text-4xl font-light mb-8 text-center">About Us</h1>
     
-    <div class="prose prose-neutral max-w-none">
-      <p class="text-lg text-neutral-600 leading-relaxed mb-8" style="white-space: pre-line;"><%= settings.aboutContent || settings.about %></p>
+    <!-- First paragraph - full width -->
+    <p class="text-lg text-neutral-600 leading-relaxed mb-12 text-center max-w-3xl mx-auto">Sierra Alpaca Sanctuary exists to give alpacas and sheep a place to stay, not a place to pass through. Many of the animals who arrive here are no longer wanted once they stop being useful.</p>
+    
+    <!-- Two column section - photo left, text right -->
+    <div class="grid md:grid-cols-2 gap-10 mb-12 items-start">
+      <div class="rounded-2xl overflow-hidden bg-neutral-100 aspect-square">
+        <% if (settings.heroImage) { %>
+          <img src="<%= settings.heroImage %>" alt="Sierra Alpaca Sanctuary" class="w-full h-full object-cover">
+        <% } else { %>
+          <div class="w-full h-full flex items-center justify-center">
+            <p class="text-neutral-400">Photo coming soon</p>
+          </div>
+        <% } %>
+      </div>
+      <div class="text-neutral-600 leading-relaxed space-y-4">
+        <p>This sanctuary exists to interrupt that pattern by offering lifelong care shaped around what animals actually need: stability, predictability, companionship, and respect for their limits.</p>
+        <p>We are intentionally small. This is not a petting zoo or a production farm. Animals are never used for entertainment, output, or performance. When an animal arrives here, this becomes home.</p>
+        <p>Beyond rescue, we create gentle opportunities for connection between animals and people, especially children and seniors. Alpacas and sheep are uniquely suited for this kind of interaction. They respond to calm, disengage from noise, and reward patience with presence.</p>
+      </div>
     </div>
     
-    <!-- Photo break -->
-    <div class="my-12 rounded-2xl overflow-hidden bg-neutral-100 aspect-video flex items-center justify-center">
-      <% if (settings.heroImage) { %>
-        <img src="<%= settings.heroImage %>" alt="Sierra Alpaca Sanctuary" class="w-full h-full object-cover">
-      <% } else { %>
-        <p class="text-neutral-400">Photo coming soon</p>
-      <% } %>
-    </div>
-    
-    <!-- Mission -->
-    <div class="bg-emerald-50 rounded-2xl p-8 mb-12">
-      <h2 class="text-xl font-medium mb-4">Our Mission</h2>
-      <p class="text-neutral-600 leading-relaxed">We provide a forever home for alpacas and sheep while creating gentle connections with our community. Our animals visit nursing homes and spend time with children, offering calm presence without demands or expectations.</p>
+    <!-- Second two column section - text left, mission right -->
+    <div class="grid md:grid-cols-2 gap-10 mb-12 items-start">
+      <div class="text-neutral-600 leading-relaxed space-y-4">
+        <p>Time here is slow, quiet, and animal-led. Some animals choose to engage. Others don't. Both are respected.</p>
+        <p>These moments are not structured as therapy and are never forced. They are simple shared experiences of being present. For many children, this is an introduction to boundaries and patience. For many seniors, it is companionship without expectation.</p>
+      </div>
+      <div class="bg-emerald-50 rounded-2xl p-8">
+        <h2 class="text-xl font-medium mb-4">Our Approach</h2>
+        <p class="text-neutral-600 leading-relaxed">Sierra Alpaca Sanctuary will never be large or loud. It is designed to be steady, consistent, and enduring. Because what these animals need most is not rescue alone, but continuity.</p>
+      </div>
     </div>
     
     <!-- Location -->
-    <div class="text-center">
+    <div class="text-center pt-8 border-t border-neutral-100">
       <h2 class="text-xl font-medium mb-3">Find Us</h2>
       <p class="text-neutral-500"><%= settings.location %></p>
       <p class="text-neutral-400 text-sm mt-2">In the Sierra Nevada foothills of El Dorado County</p>
