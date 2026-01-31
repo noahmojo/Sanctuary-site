@@ -45,7 +45,6 @@ function requireAdmin(req, res, next) {
   res.redirect('/admin/login');
 }
 
-// Email functions
 async function sendWelcomeEmail(email) {
   try {
     await resend.emails.send({
@@ -53,19 +52,60 @@ async function sendWelcomeEmail(email) {
       to: email,
       subject: 'Welcome to Sierra Alpaca Sanctuary! 🦙',
       html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #059669;">Welcome to the Herd!</h1>
-          <p>Thank you for joining the Sierra Alpaca Sanctuary community.</p>
-          <p>You'll receive updates about our animals, upcoming events, and ways to support our mission of providing forever homes for alpacas and sheep in the Sierra Nevada foothills.</p>
-          <p>In the meantime, feel free to:</p>
-          <ul>
-            <li><a href="https://www.sierraalpacas.org/animals">Meet our animals</a></li>
-            <li><a href="https://www.sierraalpacas.org/book">Book a visit</a></li>
-            <li><a href="https://www.sierraalpacas.org/donate">Become a member</a></li>
-          </ul>
-          <p>With warm regards,<br>Sierra Alpaca Sanctuary</p>
-          <p style="color: #999; font-size: 12px; margin-top: 40px;">You're receiving this because you signed up at sierraalpacas.org</p>
-        </div>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f5f5f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f4; padding: 40px 20px;">
+            <tr>
+              <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                  <tr>
+                    <td style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 40px; text-align: center;">
+                      <p style="font-size: 48px; margin: 0;">🦙</p>
+                      <h1 style="color: #ffffff; font-size: 28px; font-weight: 600; margin: 16px 0 0 0;">Welcome to the Herd!</h1>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 40px;">
+                      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">Thank you for joining the Sierra Alpaca Sanctuary community.</p>
+                      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">You'll receive updates about our animals, upcoming events, and ways to support our mission of providing forever homes for alpaca and other animals in the Sierra Nevada foothills.</p>
+                      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">In the meantime:</p>
+                      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0;">
+                        <tr>
+                          <td align="center" style="padding: 8px;">
+                            <a href="https://www.sierraalpacas.org/animals" style="display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 500; font-size: 14px;">Meet Our Animals</a>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td align="center" style="padding: 8px;">
+                            <a href="https://www.sierraalpacas.org/book" style="display: inline-block; background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 500; font-size: 14px;">Book a Visit</a>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td align="center" style="padding: 8px;">
+                            <a href="https://www.sierraalpacas.org/donate" style="display: inline-block; background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 500; font-size: 14px;">Become a Member</a>
+                          </td>
+                        </tr>
+                      </table>
+                      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 24px 0 0 0;">With warm regards,<br><strong>Sierra Alpaca Sanctuary</strong></p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="background-color: #f9fafb; padding: 24px 40px; border-top: 1px solid #e5e7eb;">
+                      <p style="color: #9ca3af; font-size: 12px; margin: 0; text-align: center;">Sierra Alpaca Sanctuary · Camino, California</p>
+                      <p style="color: #9ca3af; font-size: 12px; margin: 8px 0 0 0; text-align: center;">You're receiving this because you signed up at sierraalpacas.org</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
       `
     });
   } catch (e) {
@@ -80,17 +120,53 @@ async function sendBookingConfirmation(booking) {
       to: booking.email,
       subject: 'We received your visit request! 🦙',
       html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #059669;">Thank You, ${booking.contact}!</h1>
-          <p>We've received your request for a <strong>${booking.type}</strong> visit.</p>
-          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0;"><strong>Organization:</strong> ${booking.organization}</p>
-            <p style="margin: 10px 0 0;"><strong>Preferred Date:</strong> ${booking.date || 'Flexible'}</p>
-            <p style="margin: 10px 0 0;"><strong>Expected Attendees:</strong> ${booking.attendees || 'TBD'}</p>
-          </div>
-          <p>We'll review your request and get back to you within 24-48 hours to discuss details and availability.</p>
-          <p>With warm regards,<br>Sierra Alpaca Sanctuary</p>
-        </div>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f5f5f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f4; padding: 40px 20px;">
+            <tr>
+              <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                  <tr>
+                    <td style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 40px; text-align: center;">
+                      <p style="font-size: 48px; margin: 0;">🦙</p>
+                      <h1 style="color: #ffffff; font-size: 28px; font-weight: 600; margin: 16px 0 0 0;">Thank You, ${booking.contact}!</h1>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 40px;">
+                      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">We've received your request for a <strong>${booking.type}</strong> visit.</p>
+                      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border-radius: 12px; margin: 0 0 24px 0;">
+                        <tr>
+                          <td style="padding: 24px;">
+                            <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">Organization</p>
+                            <p style="color: #111827; font-size: 16px; font-weight: 500; margin: 0 0 16px 0;">${booking.organization}</p>
+                            <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">Preferred Date</p>
+                            <p style="color: #111827; font-size: 16px; font-weight: 500; margin: 0 0 16px 0;">${booking.date || 'Flexible'}</p>
+                            <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">Expected Attendees</p>
+                            <p style="color: #111827; font-size: 16px; font-weight: 500; margin: 0;">${booking.attendees || 'TBD'}</p>
+                          </td>
+                        </tr>
+                      </table>
+                      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">We'll review your request and get back to you within 24-48 hours to discuss details and availability.</p>
+                      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0;">With warm regards,<br><strong>Sierra Alpaca Sanctuary</strong></p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="background-color: #f9fafb; padding: 24px 40px; border-top: 1px solid #e5e7eb;">
+                      <p style="color: #9ca3af; font-size: 12px; margin: 0; text-align: center;">Sierra Alpaca Sanctuary · Camino, California</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
       `
     });
   } catch (e) {
@@ -105,17 +181,19 @@ async function sendBookingNotification(booking) {
       to: 'noah@sierraalpacas.org',
       subject: `New ${booking.type} Visit Request`,
       html: `
-        <div style="font-family: sans-serif;">
-          <h2>New Booking Request</h2>
-          <p><strong>Type:</strong> ${booking.type}</p>
-          <p><strong>Organization:</strong> ${booking.organization}</p>
-          <p><strong>Contact:</strong> ${booking.contact}</p>
-          <p><strong>Email:</strong> ${booking.email}</p>
-          <p><strong>Phone:</strong> ${booking.phone || 'Not provided'}</p>
-          <p><strong>Date:</strong> ${booking.date || 'Flexible'}</p>
-          <p><strong>Attendees:</strong> ${booking.attendees || 'TBD'}</p>
-          <p><strong>Message:</strong> ${booking.message || 'None'}</p>
-          <p><a href="https://www.sierraalpacas.org/admin/bookings">View in Admin</a></p>
+        <div style="font-family: sans-serif; max-width: 600px;">
+          <h2 style="color: #059669;">New Booking Request</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Type:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${booking.type}</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Organization:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${booking.organization}</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Contact:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${booking.contact}</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Email:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><a href="mailto:${booking.email}">${booking.email}</a></td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Phone:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${booking.phone || 'Not provided'}</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Date:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${booking.date || 'Flexible'}</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Attendees:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${booking.attendees || 'TBD'}</td></tr>
+            <tr><td style="padding: 8px 0;"><strong>Message:</strong></td><td style="padding: 8px 0;">${booking.message || 'None'}</td></tr>
+          </table>
+          <p style="margin-top: 24px;"><a href="https://www.sierraalpacas.org/admin/bookings" style="background-color: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px;">View in Admin</a></p>
         </div>
       `
     });
@@ -623,7 +701,6 @@ const formatSettings = (row) => ({
   heroImage: row.hero_image, donateUrl: row.donate_url, email: row.email, phone: row.phone
 });
 
-// Public routes
 app.get('/', async (req, res) => {
   const animals = (await pool.query('SELECT * FROM animals')).rows.map(formatAnimal);
   const settings = formatSettings((await pool.query('SELECT * FROM settings WHERE id = 1')).rows[0]);
@@ -689,11 +766,9 @@ app.post('/book', async (req, res) => {
     [booking.id, booking.type, booking.organization, booking.contact, booking.email, booking.phone, booking.date, booking.attendees, booking.message, booking.created_at, booking.status]
   );
   
-  // Send emails
   await sendBookingConfirmation(booking);
   await sendBookingNotification(booking);
   
-  // Add to subscribers
   try {
     await pool.query(
       'INSERT INTO subscribers (id, email, source, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING',
@@ -715,7 +790,6 @@ app.get('/about', async (req, res) => {
   res.render('public/about', { settings, animals });
 });
 
-// Newsletter signup
 app.post('/subscribe', async (req, res) => {
   const email = req.body.email;
   if (!email) return res.status(400).json({ error: 'Email required' });
@@ -732,7 +806,6 @@ app.post('/subscribe', async (req, res) => {
   }
 });
 
-// Admin login
 app.get('/admin/login', (req, res) => {
   res.render('admin/login', { error: null });
 });
@@ -751,7 +824,6 @@ app.get('/admin/logout', (req, res) => {
   res.redirect('/');
 });
 
-// Protected admin routes
 app.get('/admin', requireAdmin, async (req, res) => {
   const animals = (await pool.query('SELECT * FROM animals')).rows.map(formatAnimal);
   const settings = formatSettings((await pool.query('SELECT * FROM settings WHERE id = 1')).rows[0]);
@@ -824,7 +896,6 @@ app.post('/admin/settings', requireAdmin, upload.single('heroImage'), async (req
   res.redirect('/admin/settings');
 });
 
-// Subscribers admin
 app.get('/admin/subscribers', requireAdmin, async (req, res) => {
   const subscribers = (await pool.query('SELECT * FROM subscribers ORDER BY created_at DESC')).rows;
   res.render('admin/subscribers', { subscribers });
