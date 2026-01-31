@@ -2,10 +2,9 @@
 
 <section class="py-16">
   <div class="max-w-4xl mx-auto px-6">
-    <div class="text-center mb-12">
+    <div class="text-center mb-10">
       <h1 class="text-4xl font-light mb-4">Book a Visit</h1>
-      <p class="text-neutral-500 leading-relaxed max-w-2xl mx-auto mb-4">We bring our alpacas and sheep to schools, nursing homes, hospitals, and special events throughout El Dorado County and surrounding areas.</p>
-      <p class="text-neutral-600 leading-relaxed max-w-2xl mx-auto">We schedule 1-2 community visits each month. If you'd like us to visit your school, nursing home, or other event, please connect below.</p>
+      <p class="text-neutral-500 leading-relaxed max-w-xl mx-auto">We bring our alpacas and sheep to schools, nursing homes, and events throughout El Dorado County. We schedule 1-2 visits each month.</p>
     </div>
     
     <% if (success) { %>
@@ -13,8 +12,6 @@
         Thank you! We'll be in touch within 24-48 hours.
       </div>
     <% } %>
-    
-    <p class="text-center text-neutral-500 mb-8">Select the type of visit you're interested in</p>
     
     <div id="visit-types" class="grid md:grid-cols-3 gap-4 mb-8">
       <button type="button" class="visit-tile group border-2 border-neutral-100 rounded-xl p-6 text-center hover:border-neutral-300 transition" data-type="School">
@@ -85,13 +82,13 @@
         </div>
         <div>
           <label class="block text-sm font-medium mb-1.5">Expected Attendees</label>
-          <input type="text" name="attendees" placeholder="e.g., 20-30 students" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
+          <input type="text" name="attendees" placeholder="e.g., 20-30" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm">
         </div>
       </div>
       
       <div>
         <label class="block text-sm font-medium mb-1.5">Tell us about your event</label>
-        <textarea name="message" rows="4" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm resize-none" placeholder="Any details about your venue, audience, or special requests..."></textarea>
+        <textarea name="message" rows="3" class="w-full bg-neutral-50 border-0 rounded-lg px-4 py-2.5 text-sm resize-none" placeholder="Venue, audience, special requests..."></textarea>
       </div>
       
       <div class="pt-4">
