@@ -8,6 +8,16 @@
           <p class="text-neutral-400 text-sm leading-relaxed mb-4"><%= settings.tagline %></p>
           <p class="text-neutral-500 text-sm"><%= settings.location %></p>
           <p class="text-emerald-500 text-sm mt-2">501(c)(3) Nonprofit Organization</p>
+          
+          <!-- Newsletter signup -->
+          <div class="mt-6">
+            <p class="text-sm font-medium mb-2">Get sanctuary updates</p>
+            <form id="footer-subscribe" class="flex gap-2">
+              <input type="email" name="email" required placeholder="your@email.com" class="flex-1 bg-neutral-800 border-0 rounded-lg px-4 py-2 text-sm text-white placeholder-neutral-500 focus:ring-2 focus:ring-emerald-500">
+              <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">Join</button>
+            </form>
+            <p id="subscribe-message" class="text-sm mt-2 hidden"></p>
+          </div>
         </div>
         <div>
           <h4 class="font-medium mb-4 text-sm">Explore</h4>
@@ -32,5 +42,34 @@
       </div>
     </div>
   </footer>
+  
+  <script>
+  document.getElementById('footer-subscribe')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const email = this.email.value;
+    const msg = document.getElementById('subscribe-message');
+    
+    try {
+      const res = await fetch('/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      
+      if (res.ok) {
+        msg.textContent = '🦙 Welcome to the herd! Check your email.';
+        msg.className = 'text-sm mt-2 text-emerald-400';
+        this.reset();
+      } else {
+        msg.textContent = 'Something went wrong. Try again?';
+        msg.className = 'text-sm mt-2 text-red-400';
+      }
+    } catch (e) {
+      msg.textContent = 'Something went wrong. Try again?';
+      msg.className = 'text-sm mt-2 text-red-400';
+    }
+    msg.classList.remove('hidden');
+  });
+  </script>
 </body>
 </html>
