@@ -101,7 +101,7 @@ async function sendBookingConfirmation(booking) {
 async function sendBookingNotification(booking) {
   try {
     await resend.emails.send({
-      from: 'Sierra Alpaca Sanctuary <onboarding@resend.dev>',
+      from: 'Sierra Alpaca Sanctuary <hello@sierraalpacas.org>',
       to: 'noah@sierraalpacas.org',
       subject: `New ${booking.type} Visit Request`,
       html: `
