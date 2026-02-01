@@ -3,66 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %><%= settings.siteName %></title>
+  <title><%= typeof title !== 'undefined' ? title + ' - ' : '' %><%= settings.siteName %></title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-    * { font-family: 'Inter', sans-serif; }
-    .hover-lift { transition: transform 0.2s; }
-    .hover-lift:hover { transform: translateY(-4px); }
-    .fade-up { animation: fadeUp 0.6s ease-out; }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+  <style>* { font-family: 'Inter', sans-serif; }</style>
 </head>
-<body class="bg-white text-neutral-900 antialiased">
-  <!-- Header -->
-  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-neutral-100">
-    <nav class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-      <a href="/" class="text-lg font-medium"><%= settings.siteName %></a>
-      
-      <!-- Desktop Nav -->
-      <div class="hidden md:flex items-center gap-8">
-        <a href="/animals" class="text-sm text-neutral-600 hover:text-neutral-900 transition">Animals</a>
-        <a href="/book" class="text-sm text-neutral-600 hover:text-neutral-900 transition">Book a Visit</a>
-        <a href="/about" class="text-sm text-neutral-600 hover:text-neutral-900 transition">About</a>
-        <a href="/donate" class="bg-neutral-900 text-white px-5 py-2 rounded-full text-sm hover:bg-neutral-800 transition">Donate</a>
-      </div>
-      
-      <!-- Mobile Menu Button -->
-      <button id="menu-btn" class="md:hidden p-2 -mr-2" onclick="toggleMenu()">
-        <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-        <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-    </nav>
-    
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden border-t border-neutral-100 bg-white">
-      <div class="px-6 py-4 space-y-4">
-        <a href="/animals" class="block text-neutral-600 hover:text-neutral-900 transition">Animals</a>
-        <a href="/book" class="block text-neutral-600 hover:text-neutral-900 transition">Book a Visit</a>
-        <a href="/about" class="block text-neutral-600 hover:text-neutral-900 transition">About</a>
-        <a href="/donate" class="block bg-neutral-900 text-white px-5 py-3 rounded-full text-sm text-center hover:bg-neutral-800 transition">Donate</a>
+<body class="bg-white text-neutral-800">
+  <nav class="border-b border-neutral-100 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <a href="/" class="flex items-center">
+        <% if (settings.logo) { %>
+          <img src="<%= settings.logo %>" alt="<%= settings.siteName %>" class="h-10 object-contain">
+        <% } else { %>
+          <span class="text-lg font-medium"><%= settings.siteName %></span>
+        <% } %>
+      </a>
+      <div class="flex items-center gap-6 text-sm">
+        <a href="/animals" class="text-neutral-600 hover:text-neutral-900 transition">Animals</a>
+        <a href="/shop" class="text-neutral-600 hover:text-neutral-900 transition">Shop</a>
+        <a href="/book" class="text-neutral-600 hover:text-neutral-900 transition">Book a Visit</a>
+        <a href="/about" class="text-neutral-600 hover:text-neutral-900 transition">About</a>
+        <a href="/cart" class="text-neutral-600 hover:text-neutral-900 transition relative">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+          <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
+            <span class="absolute -top-2 -right-2 bg-emerald-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center"><%= cartCount %></span>
+          <% } %>
+        </a>
+        <a href="/donate" class="bg-neutral-900 text-white px-4 py-2 rounded-full text-sm hover:bg-neutral-700 transition">Donate</a>
       </div>
     </div>
-  </header>
-  
-  <script>
-    function toggleMenu() {
-      const menu = document.getElementById('mobile-menu');
-      const menuIcon = document.getElementById('menu-icon');
-      const closeIcon = document.getElementById('close-icon');
-      menu.classList.toggle('hidden');
-      menuIcon.classList.toggle('hidden');
-      closeIcon.classList.toggle('hidden');
-    }
-  </script>
-  
+  </nav>
   <main>
