@@ -698,7 +698,7 @@ const formatAnimal = (row) => ({
 const formatSettings = (row) => ({
   siteName: row.site_name, header: row.header || row.site_name, subheader: row.subheader || row.tagline,
   tagline: row.tagline, location: row.location, about: row.about, aboutContent: row.about_content || row.about,
-  heroImage: row.hero_image, donateUrl: row.donate_url, email: row.email, phone: row.phone
+  heroImage: row.hero_image, logo: row.logo, donateUrl: row.donate_url, email: row.email, phone: row.phone
 });
 
 app.get('/', async (req, res) => {
