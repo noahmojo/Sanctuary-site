@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= product ? 'Edit' : 'Add' %> Product - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>* { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-neutral-50">
+  <nav class="bg-white border-b border-neutral-200 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <a href="/admin" class="font-medium">🦙 Sanctuary Admin</a>
+      <div class="flex gap-6 text-sm">
+        <a href="/admin/animals" class="text-neutral-600 hover:text-neutral-900">Animals</a>
+        <a href="/admin/products" class="text-neutral-900 font-medium">Products</a>
+        <a href="/admin/orders" class="text-neutral-600 hover:text-neutral-900">Orders</a>
+        <a href="/admin/bookings" class="text-neutral-600 hover:text-neutral-900">Bookings</a>
+        <a href="/admin/subscribers" class="text-neutral-600 hover:text-neutral-900">Subscribers</a>
+        <a href="/admin/settings" class="text-neutral-600 hover:text-neutral-900">Settings</a>
+        <a href="/admin/logout" class="text-neutral-600 hover:text-neutral-900">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-6 py-10">
+    <a href="/admin/products" class="text-neutral-500 hover:text-neutral-700 text-sm mb-6 inline-block">← Back to Products</a>
+    
+    <h1 class="text-2xl font-light mb-8"><%= product ? 'Edit' : 'Add' %> Product</h1>
+
+    <form method="POST" action="/admin/products<%= product ? '/' + product.id : '' %>" enctype="multipart/form-data" class="space-y-6">
+      <div class="bg-white rounded-xl border border-neutral-200 p-6 space-y-5">
+        <h2 class="font-medium text-lg">Basic Info</h2>
+        
+        <div>
+          <label class="block text-sm font-medium mb-1.5">Product Name *</label>
+          <input type="text" name="name" value="<%= product ? product.name : '' %>" required class="w-full bg-neutral-50 border border-neutral-200 rounded-lg px-4 py-2.5 text-sm">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium mb-1.5">Description</label>
+          <textarea name="description" rows="4" class="w-full bg-neutral-50 border border-neutral-200 rounded-lg px-4 py-2.5 text-sm resize-none"><%= product ? product.description : '' %></textarea>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-5">
+          <div>
+            <label class="block text-sm font-medium mb-1.5">Price (USD) *</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">$</span>
+              <input type="number" name="price" step="0.01" min="0" value="<%= product ? (product.price / 100).toFixed(2) : '' %>" required class="w-full bg-neutral-50 border border-neutral-200 rounded-lg pl-8 pr-4 py-2.5 text-sm">
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-1.5">Category</label>
+            <input type="text" name="category" value="<%= product ? product.category : '' %>" placeholder="e.g., Apparel, Accessories" list="categories" class="w-full bg-neutral-50 border border-neutral-200 rounded-lg px-4 py-2.5 text-sm">
+            <datalist id="categories">
+              <option value="Apparel">
+              <option value="Accessories">
+              <option value="Home">
+              <option value="Gifts">
+            </datalist>
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium mb-1.5">Inventory</label>
+          <input type="number" name="inventory" min="0" value="<%= product && product.inventory !== null ? product.inventory : '' %>" placeholder="Leave blank for unlimited" class="w-full bg-neutral-50 border border-neutral-200 rounded-lg px-4 py-2.5 text-sm">
+          <p class="text-xs text-neutral-500 mt-1">Leave blank for unlimited inventory</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-neutral-200 p-6 space-y-5">
+        <h2 class="font-medium text-lg">Photos</h2>
+        
+        <% if (product && product.photos && product.photos.length > 0) { %>
+          <div class="grid grid-cols-4 gap-4 mb-4">
+            <% product.photos.forEach((photo, i) => { %>
+              <div class="relative group">
+                <img src="<%= photo %>" alt="Product photo" class="w-full aspect-square object-cover rounded-lg">
+                <input type="hidden" name="existingPhotos" value="<%= photo %>">
+                <label class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center cursor-pointer rounded-lg">
+                  <input type="checkbox" name="deletePhotos" value="<%= photo %>" class="sr-only peer">
+                  <span class="text-white text-xs peer-checked:text-red-400">Click to delete</span>
+                </label>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+        
+        <div>
+          <label class="block text-sm font-medium mb-1.5">Upload Photos</label>
+          <input type="file" name="photos" accept="image/*" multiple class="w-full text-sm">
+          <p class="text-xs text-neutral-500 mt-1">First photo will be the main image</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-neutral-200 p-6">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" name="active" <%= product ? (product.active ? 'checked' : '') : 'checked' %> class="w-5 h-5 rounded border-neutral-300 text-emerald-600 focus:ring-emerald-500">
+          <div>
+            <p class="font-medium">Active</p>
+            <p class="text-sm text-neutral-500">Product is visible in the shop</p>
+          </div>
+        </label>
+      </div>
+
+      <div class="flex gap-4">
+        <button type="submit" class="flex-1 bg-emerald-600 text-white py-3 rounded-lg font-medium hover:bg-emerald-700 transition"><%= product ? 'Save Changes' : 'Add Product' %></button>
+        <a href="/admin/products" class="px-6 py-3 rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition text-center">Cancel</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>
