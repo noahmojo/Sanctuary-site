@@ -1,0 +1,98 @@
+<%- include('../partials/header', { settings, title: 'Cart' }) %>
+
+<section class="py-16">
+  <div class="max-w-4xl mx-auto px-6">
+    <h1 class="text-4xl font-light mb-8 text-center">Your Cart</h1>
+    
+    <% if (cart.length === 0) { %>
+      <div class="text-center py-16">
+        <p class="text-6xl mb-4">🛒</p>
+        <p class="text-neutral-500 mb-6">Your cart is empty</p>
+        <a href="/shop" class="inline-block bg-emerald-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-emerald-700 transition">Browse Shop</a>
+      </div>
+    <% } else { %>
+      <div class="bg-white rounded-2xl border border-neutral-200 overflow-hidden mb-6">
+        <% cart.forEach(item => { %>
+          <div class="flex items-center gap-4 p-6 border-b border-neutral-100 last:border-0" id="item-<%= item.id %>">
+            <div class="w-20 h-20 rounded-lg overflow-hidden bg-neutral-100 flex-shrink-0">
+              <% if (item.photo) { %>
+                <img src="<%= item.photo %>" alt="<%= item.name %>" class="w-full h-full object-cover">
+              <% } %>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-medium truncate"><%= item.name %></h3>
+              <p class="text-neutral-500">$<%= (item.price / 100).toFixed(2) %></p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="updateCart('<%= item.id %>', <%= item.quantity - 1 %>)" class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 transition flex items-center justify-center">−</button>
+              <span class="w-8 text-center" id="qty-<%= item.id %>"><%= item.quantity %></span>
+              <button onclick="updateCart('<%= item.id %>', <%= item.quantity + 1 %>)" class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 transition flex items-center justify-center">+</button>
+            </div>
+            <div class="w-24 text-right">
+              <p class="font-medium">$<%= ((item.price * item.quantity) / 100).toFixed(2) %></p>
+            </div>
+            <button onclick="removeFromCart('<%= item.id %>')" class="text-neutral-400 hover:text-red-500 transition p-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+        <% }) %>
+      </div>
+      
+      <div class="bg-neutral-50 rounded-2xl p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-neutral-600">Subtotal</span>
+          <span class="font-medium">$<%= (total / 100).toFixed(2) %></span>
+        </div>
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-neutral-600">Shipping</span>
+          <span class="text-neutral-500">Calculated at checkout</span>
+        </div>
+        <div class="border-t border-neutral-200 pt-4 flex justify-between items-center">
+          <span class="text-lg font-medium">Total</span>
+          <span class="text-lg font-medium" id="cart-total">$<%= (total / 100).toFixed(2) %></span>
+        </div>
+      </div>
+      
+      <form method="POST" action="/checkout">
+        <button type="submit" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-medium hover:bg-emerald-700 transition">Proceed to Checkout</button>
+      </form>
+      
+      <p class="text-center text-neutral-500 text-sm mt-4">🦙 Every purchase supports the sanctuary</p>
+    <% } %>
+  </div>
+</section>
+
+<script>
+async function updateCart(productId, quantity) {
+  if (quantity <= 0) {
+    removeFromCart(productId);
+    return;
+  }
+  
+  const res = await fetch('/cart/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ productId, quantity })
+  });
+  
+  if (res.ok) {
+    location.reload();
+  }
+}
+
+async function removeFromCart(productId) {
+  const res = await fetch('/cart/remove', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ productId })
+  });
+  
+  if (res.ok) {
+    const item = document.getElementById('item-' + productId);
+    item.style.opacity = '0';
+    setTimeout(() => location.reload(), 200);
+  }
+}
+</script>
+
+<%- include('../partials/footer', { settings }) %>
