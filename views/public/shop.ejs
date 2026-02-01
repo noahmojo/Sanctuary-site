@@ -1,0 +1,46 @@
+<%- include('../partials/header', { settings, title: 'Shop' }) %>
+
+<section class="py-16">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-light mb-4">Shop</h1>
+      <p class="text-neutral-500">Every purchase supports the animals at Sierra Alpaca Sanctuary</p>
+    </div>
+
+    <% if (categories.length > 0) { %>
+      <div class="flex justify-center gap-2 mb-10 flex-wrap">
+        <a href="/shop" class="px-4 py-2 rounded-full text-sm <%= !currentCategory ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200' %> transition">All</a>
+        <% categories.forEach(cat => { %>
+          <a href="/shop?category=<%= encodeURIComponent(cat) %>" class="px-4 py-2 rounded-full text-sm <%= currentCategory === cat ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200' %> transition"><%= cat %></a>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <% if (products.length === 0) { %>
+      <div class="text-center py-16">
+        <p class="text-6xl mb-4">🦙</p>
+        <p class="text-neutral-500">No products available yet. Check back soon!</p>
+      </div>
+    <% } else { %>
+      <div class="grid md:grid-cols-3 gap-8">
+        <% products.forEach(product => { %>
+          <a href="/shop/<%= product.id %>" class="group">
+            <div class="aspect-square rounded-2xl overflow-hidden bg-neutral-100 mb-4">
+              <% if (product.photos && product.photos.length > 0) { %>
+                <img src="<%= product.photos[0] %>" alt="<%= product.name %>" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+              <% } else { %>
+                <div class="w-full h-full flex items-center justify-center text-neutral-300">
+                  <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+              <% } %>
+            </div>
+            <h3 class="font-medium mb-1 group-hover:text-emerald-600 transition"><%= product.name %></h3>
+            <p class="text-neutral-500">$<%= (product.price / 100).toFixed(2) %></p>
+          </a>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer', { settings }) %>
