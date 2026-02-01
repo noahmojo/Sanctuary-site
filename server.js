@@ -6,11 +6,14 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { Pool } = require('pg');
 const { Resend } = require('resend');
+const Stripe = require('stripe');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'alpaca123';
 const resend = new Resend(process.env.RESEND_API_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -39,6 +42,14 @@ app.use(session({
   saveUninitialized: false,
   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
 }));
+
+// Cart middleware
+app.use((req, res, next) => {
+  if (!req.session.cart) req.session.cart = [];
+  res.locals.cartCount = req.session.cart.reduce((sum, item) => sum + item.quantity, 0);
+  res.locals.STRIPE_PUBLISHABLE_KEY = STRIPE_PUBLISHABLE_KEY;
+  next();
+});
 
 function requireAdmin(req, res, next) {
   if (req.session.isAdmin) return next();
@@ -75,21 +86,9 @@ async function sendWelcomeEmail(email) {
                       <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">You'll receive updates about our animals, upcoming events, and ways to support our mission of providing forever homes for alpaca and other animals in the Sierra Nevada foothills.</p>
                       <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">In the meantime:</p>
                       <table width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0;">
-                        <tr>
-                          <td align="center" style="padding: 8px;">
-                            <a href="https://www.sierraalpacas.org/animals" style="display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 500; font-size: 14px;">Meet Our Animals</a>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td align="center" style="padding: 8px;">
-                            <a href="https://www.sierraalpacas.org/book" style="display: inline-block; background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 500; font-size: 14px;">Book a Visit</a>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td align="center" style="padding: 8px;">
-                            <a href="https://www.sierraalpacas.org/donate" style="display: inline-block; background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 500; font-size: 14px;">Become a Member</a>
-                          </td>
-                        </tr>
+                        <tr><td align="center" style="padding: 8px;"><a href="https://www.sierraalpacas.org/animals" style="display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 500; font-size: 14px;">Meet Our Animals</a></td></tr>
+                        <tr><td align="center" style="padding: 8px;"><a href="https://www.sierraalpacas.org/book" style="display: inline-block; background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 500; font-size: 14px;">Book a Visit</a></td></tr>
+                        <tr><td align="center" style="padding: 8px;"><a href="https://www.sierraalpacas.org/donate" style="display: inline-block; background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 500; font-size: 14px;">Become a Member</a></td></tr>
                       </table>
                       <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 24px 0 0 0;">With warm regards,<br><strong>Sierra Alpaca Sanctuary</strong></p>
                     </td>
@@ -122,10 +121,7 @@ async function sendBookingConfirmation(booking) {
       html: `
         <!DOCTYPE html>
         <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        </head>
+        <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
         <body style="margin: 0; padding: 0; background-color: #f5f5f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
           <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f4; padding: 40px 20px;">
             <tr>
@@ -152,15 +148,11 @@ async function sendBookingConfirmation(booking) {
                           </td>
                         </tr>
                       </table>
-                      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">We'll review your request and get back to you within 24-48 hours to discuss details and availability.</p>
+                      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">We'll review your request and get back to you within 24-48 hours.</p>
                       <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0;">With warm regards,<br><strong>Sierra Alpaca Sanctuary</strong></p>
                     </td>
                   </tr>
-                  <tr>
-                    <td style="background-color: #f9fafb; padding: 24px 40px; border-top: 1px solid #e5e7eb;">
-                      <p style="color: #9ca3af; font-size: 12px; margin: 0; text-align: center;">Sierra Alpaca Sanctuary · Camino, California</p>
-                    </td>
-                  </tr>
+                  <tr><td style="background-color: #f9fafb; padding: 24px 40px; border-top: 1px solid #e5e7eb;"><p style="color: #9ca3af; font-size: 12px; margin: 0; text-align: center;">Sierra Alpaca Sanctuary · Camino, California</p></td></tr>
                 </table>
               </td>
             </tr>
@@ -202,7 +194,95 @@ async function sendBookingNotification(booking) {
   }
 }
 
-const speciesKnowledge = {
+async function sendOrderConfirmation(order, items) {
+  try {
+    const itemsHtml = items.map(item => `
+      <tr>
+        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.name}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${item.quantity}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right;">$${(item.price * item.quantity / 100).toFixed(2)}</td>
+      </tr>
+    `).join('');
+    
+    await resend.emails.send({
+      from: 'Sierra Alpaca Sanctuary <hello@sierraalpacas.org>',
+      to: order.email,
+      subject: 'Your order is confirmed! 🦙',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+        <body style="margin: 0; padding: 0; background-color: #f5f5f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f4; padding: 40px 20px;">
+            <tr>
+              <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                  <tr>
+                    <td style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 40px; text-align: center;">
+                      <p style="font-size: 48px; margin: 0;">🦙</p>
+                      <h1 style="color: #ffffff; font-size: 28px; font-weight: 600; margin: 16px 0 0 0;">Order Confirmed!</h1>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 40px;">
+                      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">Thank you for your order, ${order.name}! Your purchase supports the animals at Sierra Alpaca Sanctuary.</p>
+                      <p style="color: #6b7280; font-size: 14px; margin: 0 0 16px 0;">Order #${order.id.slice(0, 8).toUpperCase()}</p>
+                      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px 0;">
+                        <tr style="background-color: #f9fafb;">
+                          <th style="padding: 12px; text-align: left; font-size: 14px;">Item</th>
+                          <th style="padding: 12px; text-align: center; font-size: 14px;">Qty</th>
+                          <th style="padding: 12px; text-align: right; font-size: 14px;">Price</th>
+                        </tr>
+                        ${itemsHtml}
+                        <tr>
+                          <td colspan="2" style="padding: 12px; text-align: right; font-weight: 600;">Total:</td>
+                          <td style="padding: 12px; text-align: right; font-weight: 600;">$${(order.total / 100).toFixed(2)}</td>
+                        </tr>
+                      </table>
+                      <div style="background-color: #f9fafb; border-radius: 12px; padding: 20px; margin: 0 0 24px 0;">
+                        <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">Shipping To</p>
+                        <p style="color: #111827; font-size: 14px; margin: 0;">${order.name}<br>${order.address}<br>${order.city}, ${order.state} ${order.zip}</p>
+                      </div>
+                      <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0;">We'll send you tracking info when your order ships!</p>
+                    </td>
+                  </tr>
+                  <tr><td style="background-color: #f9fafb; padding: 24px 40px; border-top: 1px solid #e5e7eb;"><p style="color: #9ca3af; font-size: 12px; margin: 0; text-align: center;">Sierra Alpaca Sanctuary · Camino, California</p></td></tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `
+    });
+  } catch (e) {
+    console.error('Order confirmation failed:', e);
+  }
+}
+
+async function sendOrderNotification(order, items) {
+  try {
+    const itemsList = items.map(item => `${item.name} x${item.quantity}`).join(', ');
+    await resend.emails.send({
+      from: 'Sierra Alpaca Sanctuary <hello@sierraalpacas.org>',
+      to: 'noah@sierraalpacas.org',
+      subject: `New Order: $${(order.total / 100).toFixed(2)}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px;">
+          <h2 style="color: #059669;">New Order Received!</h2>
+          <p><strong>Order:</strong> #${order.id.slice(0, 8).toUpperCase()}</p>
+          <p><strong>Items:</strong> ${itemsList}</p>
+          <p><strong>Total:</strong> $${(order.total / 100).toFixed(2)}</p>
+          <p><strong>Customer:</strong> ${order.name} (${order.email})</p>
+          <p><strong>Ship To:</strong><br>${order.address}<br>${order.city}, ${order.state} ${order.zip}</p>
+          <p style="margin-top: 24px;"><a href="https://www.sierraalpacas.org/admin/orders" style="background-color: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px;">View Orders</a></p>
+        </div>
+      `
+    });
+  } catch (e) {
+    console.error('Order notification failed:', e);
+  }
+}const speciesKnowledge = {
   Alpaca: {
     origin: "Alpacas were domesticated in the Andes mountains of South America over 6,000 years ago, descended from wild vicuñas. We were bred for our fiber, not meat or labor.",
     sounds: "We alpacas communicate through humming! A soft hum means I'm content or curious. A sharp, high-pitched alarm call warns the herd of danger. Snorts or clucks mean I'm annoyed.",
@@ -402,7 +482,6 @@ function generateResponse(animal, msg) {
     const safeSheep = ['carrot', 'apple', 'lettuce', 'pumpkin', 'watermelon', 'celery'];
     const toxic = ['avocado', 'onion', 'garlic', 'chocolate', 'bread', 'grain', 'dog food', 'cat food', 'horse feed', 'chicken feed'];
     const safe = isAlpaca ? safeAlpaca : safeSheep;
-    
     for (const food of toxic) {
       if (m.includes(food)) return addTone(`No! ${food.charAt(0).toUpperCase() + food.slice(1)} is dangerous for ${species.toLowerCase()}s! ${speciesInfo.toxic}`, tones, ageCategory);
     }
@@ -522,9 +601,7 @@ function generateResponse(animal, msg) {
   }
 
   if (/predator|coyote|wolf|danger|safe|guard|protect/i.test(m)) {
-    const response = isAlpaca
-      ? speciesInfo.defense
-      : 'I rely on my flock for safety. When one of us notices danger, we all alert.';
+    const response = isAlpaca ? speciesInfo.defense : 'I rely on my flock for safety. When one of us notices danger, we all alert.';
     return addTone(response, tones, ageCategory);
   }
 
@@ -606,6 +683,10 @@ function generateResponse(animal, msg) {
     return addTone('You can support the sanctuary! Check the Donate page on our website. Every bit helps with food, vet care, and keeping us safe!', tones, ageCategory);
   }
 
+  if (/shop|store|buy|merch|merchandise|shirt|sweater|gift/i.test(m)) {
+    return addTone('We have a shop! Check out our merchandise - every purchase helps support the sanctuary and our animals. You can find shirts, sweaters, and more!', tones, ageCategory);
+  }
+
   const defaults = [
     `That's interesting! I'm ${name}, a ${breed} ${species.toLowerCase()}. Ask me about my food, my breed, or the sanctuary!`,
     `${soundAction} I'm not sure about that, but I'd love to tell you about being a ${species.toLowerCase()}!`,
@@ -614,9 +695,7 @@ function generateResponse(animal, msg) {
   ];
   
   return addTone(pick(defaults), tones, ageCategory);
-}
-
-async function initDB() {
+}async function initDB() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS animals (
       id TEXT PRIMARY KEY, name TEXT, nickname TEXT, species TEXT, breed TEXT, birthday TEXT,
@@ -627,7 +706,7 @@ async function initDB() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS settings (
       id INTEGER PRIMARY KEY DEFAULT 1, site_name TEXT, header TEXT, subheader TEXT, tagline TEXT,
-      location TEXT, about TEXT, about_content TEXT, hero_image TEXT, donate_url TEXT, email TEXT, phone TEXT
+      location TEXT, about TEXT, about_content TEXT, hero_image TEXT, logo TEXT, donate_url TEXT, email TEXT, phone TEXT
     )
   `);
   
@@ -644,19 +723,34 @@ async function initDB() {
     )
   `);
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS products (
+      id TEXT PRIMARY KEY, name TEXT, description TEXT, price INTEGER, category TEXT,
+      photos TEXT[], inventory INTEGER, active BOOLEAN DEFAULT true, created_at TEXT
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id TEXT PRIMARY KEY, stripe_session_id TEXT, email TEXT, name TEXT, address TEXT,
+      city TEXT, state TEXT, zip TEXT, total INTEGER, status TEXT, items JSONB, created_at TEXT
+    )
+  `);
+
   try {
     await pool.query(`ALTER TABLE settings ADD COLUMN IF NOT EXISTS header TEXT`);
     await pool.query(`ALTER TABLE settings ADD COLUMN IF NOT EXISTS subheader TEXT`);
     await pool.query(`ALTER TABLE settings ADD COLUMN IF NOT EXISTS about_content TEXT`);
+    await pool.query(`ALTER TABLE settings ADD COLUMN IF NOT EXISTS logo TEXT`);
   } catch (e) {}
 
   const settingsCheck = await pool.query('SELECT * FROM settings WHERE id = 1');
   if (settingsCheck.rows.length === 0) {
     await pool.query(`
-      INSERT INTO settings (id, site_name, header, subheader, tagline, location, about, about_content, hero_image, donate_url, email, phone)
+      INSERT INTO settings (id, site_name, header, subheader, tagline, location, about, about_content, hero_image, logo, donate_url, email, phone)
       VALUES (1, 'Sierra Alpaca Sanctuary', 'Sierra Alpaca Sanctuary', 'Where every animal finds love', 'Where every animal finds love', 'Camino, California', 
       'Nestled in the Sierra Nevada foothills, we provide a forever home for alpacas, sheep, and other barnyard friends.', 
-      'Sierra Alpaca Sanctuary is a small family-run rescue nestled in the Sierra Nevada foothills of Camino, California.', '', '', '', '')
+      'Sierra Alpaca Sanctuary is a small family-run rescue nestled in the Sierra Nevada foothills of Camino, California.', '', '', '', '', '')
     `);
   }
 
@@ -701,6 +795,18 @@ const formatSettings = (row) => ({
   heroImage: row.hero_image, logo: row.logo, donateUrl: row.donate_url, email: row.email, phone: row.phone
 });
 
+const formatProduct = (row) => ({
+  id: row.id, name: row.name, description: row.description, price: row.price, category: row.category,
+  photos: row.photos || [], inventory: row.inventory, active: row.active, createdAt: row.created_at
+});
+
+const formatOrder = (row) => ({
+  id: row.id, stripeSessionId: row.stripe_session_id, email: row.email, name: row.name,
+  address: row.address, city: row.city, state: row.state, zip: row.zip,
+  total: row.total, status: row.status, items: row.items, createdAt: row.created_at
+});
+
+// Public routes
 app.get('/', async (req, res) => {
   const animals = (await pool.query('SELECT * FROM animals')).rows.map(formatAnimal);
   const settings = formatSettings((await pool.query('SELECT * FROM settings WHERE id = 1')).rows[0]);
@@ -748,34 +854,20 @@ app.get('/book', async (req, res) => {
 
 app.post('/book', async (req, res) => {
   const booking = {
-    id: uuidv4(),
-    type: req.body.type,
-    organization: req.body.organization,
-    contact: req.body.contact,
-    email: req.body.email,
-    phone: req.body.phone,
-    date: req.body.date,
-    attendees: req.body.attendees,
-    message: req.body.message,
-    created_at: new Date().toISOString(),
-    status: 'pending'
+    id: uuidv4(), type: req.body.type, organization: req.body.organization, contact: req.body.contact,
+    email: req.body.email, phone: req.body.phone, date: req.body.date, attendees: req.body.attendees,
+    message: req.body.message, created_at: new Date().toISOString(), status: 'pending'
   };
-  
   await pool.query(
     'INSERT INTO bookings (id, type, organization, contact, email, phone, date, attendees, message, created_at, status) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',
     [booking.id, booking.type, booking.organization, booking.contact, booking.email, booking.phone, booking.date, booking.attendees, booking.message, booking.created_at, booking.status]
   );
-  
   await sendBookingConfirmation(booking);
   await sendBookingNotification(booking);
-  
   try {
-    await pool.query(
-      'INSERT INTO subscribers (id, email, source, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING',
-      [uuidv4(), booking.email, 'booking', new Date().toISOString()]
-    );
+    await pool.query('INSERT INTO subscribers (id, email, source, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING',
+      [uuidv4(), booking.email, 'booking', new Date().toISOString()]);
   } catch (e) {}
-  
   res.redirect('/book?success=1');
 });
 
@@ -793,12 +885,9 @@ app.get('/about', async (req, res) => {
 app.post('/subscribe', async (req, res) => {
   const email = req.body.email;
   if (!email) return res.status(400).json({ error: 'Email required' });
-  
   try {
-    await pool.query(
-      'INSERT INTO subscribers (id, email, source, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING',
-      [uuidv4(), email, 'newsletter', new Date().toISOString()]
-    );
+    await pool.query('INSERT INTO subscribers (id, email, source, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING',
+      [uuidv4(), email, 'newsletter', new Date().toISOString()]);
     await sendWelcomeEmail(email);
     res.json({ success: true });
   } catch (e) {
@@ -806,6 +895,137 @@ app.post('/subscribe', async (req, res) => {
   }
 });
 
+// Shop routes
+app.get('/shop', async (req, res) => {
+  const settings = formatSettings((await pool.query('SELECT * FROM settings WHERE id = 1')).rows[0]);
+  let products = (await pool.query('SELECT * FROM products WHERE active = true ORDER BY created_at DESC')).rows.map(formatProduct);
+  const { category } = req.query;
+  if (category) products = products.filter(p => p.category === category);
+  const categories = [...new Set((await pool.query('SELECT DISTINCT category FROM products WHERE active = true')).rows.map(r => r.category))];
+  res.render('public/shop', { settings, products, categories, currentCategory: category });
+});
+
+app.get('/shop/:id', async (req, res) => {
+  const result = await pool.query('SELECT * FROM products WHERE id = $1 AND active = true', [req.params.id]);
+  if (result.rows.length === 0) return res.status(404).send('Not found');
+  const product = formatProduct(result.rows[0]);
+  const settings = formatSettings((await pool.query('SELECT * FROM settings WHERE id = 1')).rows[0]);
+  res.render('public/product', { settings, product });
+});
+
+app.post('/cart/add', async (req, res) => {
+  const { productId, quantity = 1 } = req.body;
+  const result = await pool.query('SELECT * FROM products WHERE id = $1', [productId]);
+  if (result.rows.length === 0) return res.status(404).json({ error: 'Product not found' });
+  const product = formatProduct(result.rows[0]);
+  const existingItem = req.session.cart.find(item => item.id === productId);
+  if (existingItem) {
+    existingItem.quantity += parseInt(quantity);
+  } else {
+    req.session.cart.push({ id: productId, name: product.name, price: product.price, quantity: parseInt(quantity), photo: product.photos[0] });
+  }
+  res.json({ success: true, cartCount: req.session.cart.reduce((sum, item) => sum + item.quantity, 0) });
+});
+
+app.post('/cart/update', (req, res) => {
+  const { productId, quantity } = req.body;
+  const item = req.session.cart.find(item => item.id === productId);
+  if (item) {
+    if (quantity <= 0) {
+      req.session.cart = req.session.cart.filter(item => item.id !== productId);
+    } else {
+      item.quantity = parseInt(quantity);
+    }
+  }
+  res.json({ success: true, cartCount: req.session.cart.reduce((sum, item) => sum + item.quantity, 0) });
+});
+
+app.post('/cart/remove', (req, res) => {
+  const { productId } = req.body;
+  req.session.cart = req.session.cart.filter(item => item.id !== productId);
+  res.json({ success: true, cartCount: req.session.cart.reduce((sum, item) => sum + item.quantity, 0) });
+});
+
+app.get('/cart', async (req, res) => {
+  const settings = formatSettings((await pool.query('SELECT * FROM settings WHERE id = 1')).rows[0]);
+  const cart = req.session.cart || [];
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  res.render('public/cart', { settings, cart, total });
+});
+
+app.post('/checkout', async (req, res) => {
+  const cart = req.session.cart || [];
+  if (cart.length === 0) return res.redirect('/cart');
+  
+  const lineItems = cart.map(item => ({
+    price_data: {
+      currency: 'usd',
+      product_data: { name: item.name },
+      unit_amount: item.price
+    },
+    quantity: item.quantity
+  }));
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ['card'],
+    line_items: lineItems,
+    mode: 'payment',
+    shipping_address_collection: { allowed_countries: ['US'] },
+    success_url: `https://www.sierraalpacas.org/order/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `https://www.sierraalpacas.org/cart`
+  });
+
+  res.redirect(session.url);
+});
+
+app.get('/order/success', async (req, res) => {
+  const sessionId = req.query.session_id;
+  if (!sessionId) return res.redirect('/shop');
+
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ['line_items'] });
+    const existingOrder = await pool.query('SELECT * FROM orders WHERE stripe_session_id = $1', [sessionId]);
+    
+    if (existingOrder.rows.length === 0 && session.payment_status === 'paid') {
+      const order = {
+        id: uuidv4(),
+        stripe_session_id: sessionId,
+        email: session.customer_details.email,
+        name: session.shipping_details?.name || session.customer_details.name,
+        address: session.shipping_details?.address?.line1 || '',
+        city: session.shipping_details?.address?.city || '',
+        state: session.shipping_details?.address?.state || '',
+        zip: session.shipping_details?.address?.postal_code || '',
+        total: session.amount_total,
+        status: 'pending',
+        items: JSON.stringify(req.session.cart),
+        created_at: new Date().toISOString()
+      };
+
+      await pool.query(
+        'INSERT INTO orders (id, stripe_session_id, email, name, address, city, state, zip, total, status, items, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)',
+        [order.id, order.stripe_session_id, order.email, order.name, order.address, order.city, order.state, order.zip, order.total, order.status, order.items, order.created_at]
+      );
+
+      await sendOrderConfirmation(order, req.session.cart);
+      await sendOrderNotification(order, req.session.cart);
+      
+      // Add to subscribers
+      try {
+        await pool.query('INSERT INTO subscribers (id, email, source, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING',
+          [uuidv4(), order.email, 'order', new Date().toISOString()]);
+      } catch (e) {}
+
+      req.session.cart = [];
+    }
+
+    const settings = formatSettings((await pool.query('SELECT * FROM settings WHERE id = 1')).rows[0]);
+    res.render('public/order-success', { settings, session });
+  } catch (e) {
+    console.error('Order success error:', e);
+    res.redirect('/shop');
+  }
+});// Admin login
 app.get('/admin/login', (req, res) => {
   res.render('admin/login', { error: null });
 });
@@ -824,11 +1044,15 @@ app.get('/admin/logout', (req, res) => {
   res.redirect('/');
 });
 
+// Protected admin routes
 app.get('/admin', requireAdmin, async (req, res) => {
   const animals = (await pool.query('SELECT * FROM animals')).rows.map(formatAnimal);
   const settings = formatSettings((await pool.query('SELECT * FROM settings WHERE id = 1')).rows[0]);
-  const bookings = (await pool.query('SELECT * FROM bookings')).rows;
-  res.render('admin/dashboard', { animals, settings, bookings });
+  const bookings = (await pool.query('SELECT * FROM bookings ORDER BY created_at DESC LIMIT 5')).rows;
+  const orders = (await pool.query('SELECT * FROM orders ORDER BY created_at DESC LIMIT 5')).rows.map(formatOrder);
+  const products = (await pool.query('SELECT * FROM products')).rows.map(formatProduct);
+  const subscribers = (await pool.query('SELECT COUNT(*) FROM subscribers')).rows[0].count;
+  res.render('admin/dashboard', { animals, settings, bookings, orders, products, subscribers });
 });
 
 app.get('/admin/animals', requireAdmin, async (req, res) => {
@@ -885,13 +1109,15 @@ app.get('/admin/settings', requireAdmin, async (req, res) => {
   res.render('admin/settings', { settings });
 });
 
-app.post('/admin/settings', requireAdmin, upload.single('heroImage'), async (req, res) => {
+app.post('/admin/settings', requireAdmin, upload.fields([{ name: 'heroImage', maxCount: 1 }, { name: 'logo', maxCount: 1 }]), async (req, res) => {
   const current = (await pool.query('SELECT * FROM settings WHERE id = 1')).rows[0];
   let heroImage = req.body.existingHeroImage || current?.hero_image || '';
-  if (req.file) heroImage = req.file.path;
+  let logo = req.body.existingLogo || current?.logo || '';
+  if (req.files?.heroImage) heroImage = req.files.heroImage[0].path;
+  if (req.files?.logo) logo = req.files.logo[0].path;
   await pool.query(
-    'UPDATE settings SET site_name=$1, header=$2, subheader=$3, tagline=$4, location=$5, about=$6, about_content=$7, hero_image=$8, donate_url=$9, email=$10, phone=$11 WHERE id=1',
-    [req.body.siteName, req.body.header, req.body.subheader, req.body.tagline, req.body.location, req.body.about, req.body.aboutContent, heroImage, req.body.donateUrl, req.body.email, req.body.phone]
+    'UPDATE settings SET site_name=$1, header=$2, subheader=$3, tagline=$4, location=$5, about=$6, about_content=$7, hero_image=$8, logo=$9, donate_url=$10, email=$11, phone=$12 WHERE id=1',
+    [req.body.siteName, req.body.header, req.body.subheader, req.body.tagline, req.body.location, req.body.about, req.body.aboutContent, heroImage, logo, req.body.donateUrl, req.body.email, req.body.phone]
   );
   res.redirect('/admin/settings');
 });
@@ -912,6 +1138,70 @@ app.get('/admin/subscribers/export', requireAdmin, async (req, res) => {
 app.post('/admin/subscribers/:id/delete', requireAdmin, async (req, res) => {
   await pool.query('DELETE FROM subscribers WHERE id = $1', [req.params.id]);
   res.redirect('/admin/subscribers');
+});
+
+// Admin Products
+app.get('/admin/products', requireAdmin, async (req, res) => {
+  const products = (await pool.query('SELECT * FROM products ORDER BY created_at DESC')).rows.map(formatProduct);
+  res.render('admin/products', { products });
+});
+
+app.get('/admin/products/new', requireAdmin, (req, res) => {
+  res.render('admin/product-form', { product: null });
+});
+
+app.get('/admin/products/:id/edit', requireAdmin, async (req, res) => {
+  const result = await pool.query('SELECT * FROM products WHERE id = $1', [req.params.id]);
+  if (result.rows.length === 0) return res.status(404).send('Not found');
+  res.render('admin/product-form', { product: formatProduct(result.rows[0]) });
+});
+
+app.post('/admin/products', requireAdmin, upload.array('photos', 10), async (req, res) => {
+  const photos = req.files ? req.files.map(f => f.path) : [];
+  const price = Math.round(parseFloat(req.body.price) * 100);
+  const inventory = req.body.inventory === '' ? null : parseInt(req.body.inventory);
+  await pool.query(
+    'INSERT INTO products (id, name, description, price, category, photos, inventory, active, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)',
+    [uuidv4(), req.body.name, req.body.description, price, req.body.category, photos, inventory, req.body.active === 'on', new Date().toISOString()]
+  );
+  res.redirect('/admin/products');
+});
+
+app.post('/admin/products/:id', requireAdmin, upload.array('photos', 10), async (req, res) => {
+  const newPhotos = req.files ? req.files.map(f => f.path) : [];
+  let existingPhotos = req.body.existingPhotos ? (Array.isArray(req.body.existingPhotos) ? req.body.existingPhotos : [req.body.existingPhotos]) : [];
+  const deletePhotos = req.body.deletePhotos ? (Array.isArray(req.body.deletePhotos) ? req.body.deletePhotos : [req.body.deletePhotos]) : [];
+  existingPhotos = existingPhotos.filter(p => !deletePhotos.includes(p));
+  const price = Math.round(parseFloat(req.body.price) * 100);
+  const inventory = req.body.inventory === '' ? null : parseInt(req.body.inventory);
+  await pool.query(
+    'UPDATE products SET name=$1, description=$2, price=$3, category=$4, photos=$5, inventory=$6, active=$7 WHERE id=$8',
+    [req.body.name, req.body.description, price, req.body.category, [...existingPhotos, ...newPhotos], inventory, req.body.active === 'on', req.params.id]
+  );
+  res.redirect('/admin/products');
+});
+
+app.post('/admin/products/:id/delete', requireAdmin, async (req, res) => {
+  await pool.query('DELETE FROM products WHERE id = $1', [req.params.id]);
+  res.redirect('/admin/products');
+});
+
+// Admin Orders
+app.get('/admin/orders', requireAdmin, async (req, res) => {
+  const orders = (await pool.query('SELECT * FROM orders ORDER BY created_at DESC')).rows.map(formatOrder);
+  res.render('admin/orders', { orders });
+});
+
+app.get('/admin/orders/:id', requireAdmin, async (req, res) => {
+  const result = await pool.query('SELECT * FROM orders WHERE id = $1', [req.params.id]);
+  if (result.rows.length === 0) return res.status(404).send('Not found');
+  const order = formatOrder(result.rows[0]);
+  res.render('admin/order-detail', { order });
+});
+
+app.post('/admin/orders/:id/status', requireAdmin, async (req, res) => {
+  await pool.query('UPDATE orders SET status = $1 WHERE id = $2', [req.body.status, req.params.id]);
+  res.redirect('/admin/orders');
 });
 
 app.listen(PORT, () => console.log(`Sanctuary running on port ${PORT}`));
