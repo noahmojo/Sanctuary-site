@@ -13,12 +13,14 @@
     <div class="max-w-6xl mx-auto flex justify-between items-center">
       <a href="/" class="flex items-center">
         <% if (settings.logo) { %>
-          <img src="<%= settings.logo %>" alt="<%= settings.siteName %>" class="h-16 object-contain">
+          <img src="<%= settings.logo %>" alt="<%= settings.siteName %>" class="h-12 object-contain">
         <% } else { %>
           <span class="text-lg font-medium"><%= settings.siteName %></span>
         <% } %>
       </a>
-      <div class="flex items-center gap-6 text-sm">
+      
+      <!-- Desktop menu -->
+      <div class="hidden md:flex items-center gap-6 text-sm">
         <a href="/animals" class="text-neutral-600 hover:text-neutral-900 transition">Animals</a>
         <a href="/shop" class="text-neutral-600 hover:text-neutral-900 transition">Shop</a>
         <a href="/book" class="text-neutral-600 hover:text-neutral-900 transition">Book a Visit</a>
@@ -30,6 +32,30 @@
           <% } %>
         </a>
         <a href="/donate" class="bg-neutral-900 text-white px-4 py-2 rounded-full text-sm hover:bg-neutral-700 transition">Donate</a>
+      </div>
+      
+      <!-- Mobile menu button -->
+      <div class="md:hidden flex items-center gap-4">
+        <a href="/cart" class="text-neutral-600 relative">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+          <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
+            <span class="absolute -top-2 -right-2 bg-emerald-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center"><%= cartCount %></span>
+          <% } %>
+        </a>
+        <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-neutral-600 p-1">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile menu dropdown -->
+    <div id="mobile-menu" class="hidden md:hidden mt-4 pb-2 border-t border-neutral-100 pt-4">
+      <div class="flex flex-col gap-3">
+        <a href="/animals" class="text-neutral-600 hover:text-neutral-900 transition py-2">Animals</a>
+        <a href="/shop" class="text-neutral-600 hover:text-neutral-900 transition py-2">Shop</a>
+        <a href="/book" class="text-neutral-600 hover:text-neutral-900 transition py-2">Book a Visit</a>
+        <a href="/about" class="text-neutral-600 hover:text-neutral-900 transition py-2">About</a>
+        <a href="/donate" class="bg-neutral-900 text-white px-4 py-2 rounded-full text-sm hover:bg-neutral-700 transition text-center mt-2">Donate</a>
       </div>
     </div>
   </nav>
