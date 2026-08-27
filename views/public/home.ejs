@@ -5,17 +5,17 @@
   <% if (settings.heroImage) { %>
     <div class="absolute inset-0">
       <img src="<%= settings.heroImage %>" alt="Sanctuary" class="w-full h-full object-cover">
-      <div class="absolute inset-0 bg-white/70"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
     </div>
   <% } %>
   <div class="max-w-6xl mx-auto px-6 w-full relative z-10">
     <div class="max-w-2xl fade-up">
-      <p class="text-sm text-neutral-400 mb-4 tracking-wide uppercase"><%= settings.location %></p>
-      <h1 class="text-5xl md:text-6xl font-light leading-tight mb-6 tracking-tight"><%= settings.header || settings.siteName %></h1>
-      <p class="text-xl text-neutral-500 leading-relaxed mb-10"><%= settings.subheader || settings.tagline %></p>
+      <p class="text-sm <%= settings.heroImage ? 'text-white/70' : 'text-neutral-400' %> mb-4 tracking-wide uppercase"><%= settings.location %></p>
+      <h1 class="text-5xl md:text-6xl font-light leading-tight mb-6 tracking-tight <%= settings.heroImage ? 'text-white' : '' %>"><%= settings.header || settings.siteName %></h1>
+      <p class="text-xl <%= settings.heroImage ? 'text-white/85' : 'text-neutral-500' %> leading-relaxed mb-10"><%= settings.subheader || settings.tagline %></p>
       <div class="flex gap-4">
-        <a href="/animals" class="bg-neutral-900 text-white px-8 py-4 rounded-full text-sm font-medium hover:bg-neutral-800 transition">Meet the Animals</a>
-        <a href="/book" class="border border-neutral-200 px-8 py-4 rounded-full text-sm font-medium hover:border-neutral-400 transition">Book a Visit</a>
+        <a href="/animals" class="bg-white text-neutral-900 px-8 py-4 rounded-full text-sm font-medium hover:bg-neutral-100 transition">Meet the Animals</a>
+        <a href="/book" class="border <%= settings.heroImage ? 'border-white/50 text-white hover:border-white' : 'border-neutral-200 hover:border-neutral-400' %> px-8 py-4 rounded-full text-sm font-medium transition">Book a Visit</a>
       </div>
     </div>
   </div>
