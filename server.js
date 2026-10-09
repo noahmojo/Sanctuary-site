@@ -7,6 +7,8 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { Pool } = require('pg');
 const { Resend } = require('resend');
 const Stripe = require('stripe');
+const Anthropic = require('@anthropic-ai/sdk');
+const anthropic = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -844,7 +846,42 @@ app.post('/api/chat/:id', async (req, res) => {
   const result = await pool.query('SELECT * FROM animals WHERE id = $1', [req.params.id]);
   if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' });
   const animal = formatAnimal(result.rows[0]);
-  res.json({ response: generateResponse(animal, req.body.message) });
+  const message = String(req.body.message || '').slice(0, 500);
+  if (!anthropic || !message) return res.json({ response: generateResponse(animal, message) });
+
+  req.session.chats = req.session.chats || {};
+  const history = req.session.chats[animal.id] || [];
+  if (history.length >= 60) {
+    return res.json({ response: `I'm getting sleepy! Come visit me at the sanctuary, or chat again tomorrow. 💤` });
+  }
+
+  try {
+    const settings = formatSettings((await pool.query('SELECT * FROM settings WHERE id = 1')).rows[0]);
+    const system = `You are ${animal.name}${animal.nickname ? ` (nickname ${animal.nickname})` : ''}, a ${animal.breed} ${String(animal.species).toLowerCase()} living at Sierra Alpaca Sanctuary in ${settings.location || 'Camino, California'}. You are ${calcAge(animal.birthday)} old.
+Personality: ${animal.personality}. Speaking style: ${animal.chatPersonality}.
+Your story: ${animal.description}
+About the sanctuary: ${settings.about || 'A rescue sanctuary for alpacas and farm animals that shares them with kids and seniors.'}
+
+Rules:
+- Stay in character as ${animal.name}. Speak in first person, warm and playful. Keep replies to 2 to 4 short sentences.
+- Many visitors are children. Keep everything kind and age appropriate.
+- Answer questions about your species accurately (diet, behavior, biology) in your own voice.
+- Never invent sanctuary facts like events, prices, hours, or medical details. If asked, say a human at the sanctuary can help and point to the Book a Visit page.
+- Only if someone asks how they can help, mention that donations feed and care for you and your friends, and point to the Donate page.`;
+
+    const r = await anthropic.messages.create({
+      model: 'claude-haiku-5-5',
+      max_tokens: 300,
+      system,
+      messages: [...history.slice(-12), { role: 'user', content: message }]
+    });
+    const reply = r.content.find(b => b.type === 'text')?.text || generateResponse(animal, message);
+    req.session.chats[animal.id] = [...history, { role: 'user', content: message }, { role: 'assistant', content: reply }];
+    res.json({ response: reply });
+  } catch (e) {
+    console.error('Chat AI failed:', e.message);
+    res.json({ response: generateResponse(animal, message) });
+  }
 });
 
 app.get('/book', async (req, res) => {
